@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════
+   MONOCHROME BLUEPRINT — Design System Base Styles
+   ═══════════════════════════════════════════════════════ */
+
+@layer base {
+  html {
+    font-family: 'Inter', sans-serif;
+  }
+
+  body {
+    background-color: #131313;
+    color: #e5e2e1;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .text-headline-lg { font-size: 32px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 600; }
+  .text-headline-md { font-size: 24px; line-height: 1.3; letter-spacing: -0.01em; font-weight: 600; }
+  .text-headline-sm { font-size: 18px; line-height: 1.4; letter-spacing: 0; font-weight: 500; }
+  .text-body-lg { font-size: 16px; line-height: 1.6; letter-spacing: 0; font-weight: 400; }
+  .text-body-md { font-size: 14px; line-height: 1.5; letter-spacing: 0; font-weight: 400; }
+  .text-label-md { font-size: 12px; line-height: 1; letter-spacing: 0.05em; font-weight: 500; }
+  .text-label-sm { font-size: 11px; line-height: 1; letter-spacing: 0.08em; font-weight: 600; }
+}
+
+@layer components {
+  .wireframe-pattern { background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0); background-size: 24px 24px; }
+  .wireframe-pattern-alt { background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255, 255, 255, 0.03) 20px, rgba(255, 255, 255, 0.03) 21px); }
+  .wireframe-hatch { background-color: #1E2330; background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent); background-size: 20px 20px; }
+  .x-placeholder { position: relative; background: #1E2330; border: 1px solid rgba(255, 255, 255, 0.1); }
+  .x-placeholder::before, .x-placeholder::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top right, transparent calc(50% - 0.5px), rgba(255, 255, 255, 0.05) 50%, transparent calc(50% + 0.5px)), linear-gradient(to bottom right, transparent calc(50% - 0.5px), rgba(255, 255, 255, 0.05) 50%, transparent calc(50% + 0.5px)); }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}

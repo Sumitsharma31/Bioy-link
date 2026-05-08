@@ -1,0 +1,33 @@
+# Task List: Next.js 15 Migration
+
+- [ ] Task 1: Environment Initialization
+    - [ ] Step 1: Install Next.js and TypeScript dependencies
+    - [ ] Step 2: Update package.json scripts
+    - [ ] Step 3: Create next.config.ts
+    - [ ] Step 4: Commit
+- [ ] Task 2: Design System Migration
+    - [ ] Step 1: Move index.css content to app/globals.css
+    - [ ] Step 2: Create Root Layout
+    - [ ] Step 3: Commit
+- [ ] Task 3: Shared Components Migration
+    - [ ] Step 1: Migrate Navbar to .tsx
+    - [ ] Step 2: Migrate Sidebar to .tsx (Client Component)
+    - [ ] Step 3: Migrate Footer to .tsx
+    - [ ] Step 4: Migrate DashboardLayout to .tsx (Client Component)
+    - [ ] Step 5: Commit
+- [ ] Task 4: Public Pages Migration
+    - [ ] Step 1: Migrate Landing Page
+    - [ ] Step 2: Migrate Login Page (Client Component)
+    - [ ] Step 3: Migrate Onboarding Page (Client Component)
+    - [ ] Step 4: Commit
+- [ ] Task 5: Dashboard Pages Migration
+    - [ ] Step 1: Create Dashboard Layout
+    - [ ] Step 2: Migrate Dashboard Pages
+    - [ ] Step 3: Commit
+- [ ] Task 6: Dynamic Public Profile Migration
+    - [ ] Step 1: Migrate Public Profile
+    - [ ] Step 2: Commit
+- [ ] Task 7: Cleanup and Verification
+    - [ ] Step 1: Delete old Vite/React files
+    - [ ] Step 2: Run build to verify
+    - [ ] Step 3: Final Commit
