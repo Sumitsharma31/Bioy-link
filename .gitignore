@@ -29,4 +29,8 @@ dist-ssr
 *.sln
 *.sw?
 
-UIDesign
+# UI Designs
+UIDesigns/
+.vercel
+out/
+build/

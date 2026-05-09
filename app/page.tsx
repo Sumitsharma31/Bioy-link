@@ -28,7 +28,7 @@ const LandingPage = () => {
               </p>
               <div className="flex gap-md mt-md flex-wrap">
                 <Link
-                  href="/login"
+                  href="/login?mode=signup"
                   className="bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all"
                 >
                   Build Your Page
@@ -230,22 +230,22 @@ const LandingPage = () => {
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 w-full z-50 bg-background/80 backdrop-blur-md border-t border-outline-variant/20 md:hidden h-16 flex items-center">
         <div className="flex-1 flex justify-around items-center">
-          <div className="flex flex-col items-center gap-1 text-primary">
+          <Link href="/" className="flex flex-col items-center gap-1 text-primary">
             <Home size={20} />
             <span className="text-[10px] font-bold">Home</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 text-on-surface-variant">
+          </Link>
+          <Link href="/showcase" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
             <Compass size={20} />
             <span className="text-[10px]">Explore</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 text-on-surface-variant">
+          </Link>
+          <Link href="/pricing" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
             <Zap size={20} />
             <span className="text-[10px]">Pricing</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 text-on-surface-variant">
+          </Link>
+          <Link href="/login" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
             <User size={20} />
-            <span className="text-[10px]">Login</span>
-          </div>
+            <span className="text-[10px]">Account</span>
+          </Link>
         </div>
       </nav>
     </div>

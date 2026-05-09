@@ -5,7 +5,7 @@ import {
   Phone, ShoppingBag, Video, Music, MessageCircle
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 const iconMap: Record<string, React.ElementType> = {
   Globe, Instagram, Twitter, Linkedin, Github, Youtube, Facebook, 
@@ -20,7 +20,8 @@ export default async function PublicProfile({
   const username = (await params).username;
 
   // Ignore static files that might accidentally hit this dynamic route
-  if (username.includes('.')) {
+  // Allow dots now (usernames like hey.sumit are valid)
+  if (/\.(png|jpg|svg|ico|css|js|json|txt|xml|webp)$/.test(username)) {
     notFound();
   }
 
@@ -44,6 +45,19 @@ export default async function PublicProfile({
     .single();
 
   if (!profile) {
+    // Check username_history — old username may redirect to a new one
+    const { data: history } = await supabase
+      .from('username_history')
+      .select('new_username')
+      .eq('old_username', username)
+      .order('changed_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (history?.new_username) {
+      redirect(`/${history.new_username}`);
+    }
+
     notFound();
   }
 

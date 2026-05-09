@@ -4,8 +4,13 @@ import { z } from 'zod'
 export const usernameSchema = z
   .string()
   .min(3, 'Username must be at least 3 characters')
-  .max(24, 'Username must be less than 24 characters')
-  .regex(/^[a-z0-9_]+$/, 'Username can only contain lowercase letters, numbers, and underscores')
+  .max(30, 'Username must be 30 characters or fewer')
+  .regex(/^[a-z0-9._]{3,30}$/, 'Only lowercase letters, numbers, dots, and underscores are allowed')
+  .refine((u) => !/__/.test(u), 'Underscores cannot appear consecutively (__)')
+  .refine((u) => !(/\.\./.test(u)), 'Dots cannot appear consecutively (..)')
+  .refine((u) => !/^[._]/.test(u), 'Username cannot start with a dot or underscore')
+  .refine((u) => !/[._]$/.test(u), 'Username cannot end with a dot or underscore')
+
 
 // Auth schemas
 export const authSchema = z.object({

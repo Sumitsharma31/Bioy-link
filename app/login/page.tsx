@@ -1,18 +1,52 @@
 'use client';
 
-import React, { useActionState, useState } from 'react';
+import React, { useActionState, useState, Suspense, useEffect } from 'react';
 import Link from 'next/link';
-import { Link2, ArrowRight, Loader2 } from 'lucide-react';
-import { login, signup } from './actions';
+import Image from 'next/image';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { handleAuth } from './actions';
 import { createClient } from '@/lib/supabase/client';
 
 const initialState = { error: '', message: '' };
 
+// Outer shell just provides the Suspense boundary needed by useSearchParams
 const LoginPage = () => {
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const action = isLoginMode ? login : signup;
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center p-md">
+        <Loader2 size={32} className="animate-spin text-primary" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
+  );
+};
+
+const LoginForm = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const mode = searchParams.get('mode');
+
+  // true = login mode, false = signup mode
+  const [isLoginMode, setIsLoginMode] = useState(mode !== 'signup');
+
+  // Keep state in sync when the URL changes (e.g. pressing Get Started nav button
+  // while already on the login page)
+  useEffect(() => {
+    setIsLoginMode(mode !== 'signup');
+  }, [mode]);
+
+  // Single stable action — never swapped. Mode is passed as a hidden field instead.
   // @ts-ignore - useActionState is available in React 19 but types might be lagging
-  const [state, formAction, isPending] = useActionState(action, initialState);
+  const [state, formAction, isPending] = useActionState(handleAuth, initialState);
+
+  const toggleMode = () => {
+    const nextIsLogin = !isLoginMode;
+    setIsLoginMode(nextIsLogin);
+    // Keep the URL in sync so browser back/forward works correctly
+    router.push(`/login${nextIsLogin ? '' : '?mode=signup'}`, { scroll: false });
+  };
 
   const handleGoogleLogin = async () => {
     const supabase = createClient();
@@ -25,12 +59,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-md relative overflow-hidden">
+    <div className="min-h-dvh bg-background flex items-center justify-center px-md pt-md pb-24 relative overflow-hidden">
       <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
       <div className="w-full max-w-[480px] bg-surface-container-low border border-outline-variant/30 rounded-xl p-xl shadow-2xl relative z-10">
         <div className="flex flex-col items-center mb-xl">
-          <div className="w-14 h-14 bg-primary-container rounded-xl flex items-center justify-center mb-lg shadow-lg">
-            <Link2 size={28} className="text-on-primary-container" />
+          <div className="w-16 h-16 flex items-center justify-center mb-lg">
+            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />
           </div>
           <h1 className="text-headline-md text-on-surface mb-xs">
             {isLoginMode ? 'Welcome back' : 'Create an account'}
@@ -55,16 +89,24 @@ const LoginPage = () => {
           </div>
         </div>
 
+        {/*
+          KEY FIX: We use a single stable `handleAuth` action (never swapped).
+          The mode is communicated via a hidden input field so the server action
+          knows whether to call login() or signup().
+        */}
         <form action={formAction} className="space-y-lg">
+          {/* Hidden field tells the server action which path to take */}
+          <input type="hidden" name="mode" value={isLoginMode ? 'login' : 'signup'} />
+
           <div>
             <label className="block text-label-sm text-on-surface-variant uppercase mb-xs" htmlFor="email">Email Address</label>
-            <input 
+            <input
               id="email"
               name="email"
-              type="email" 
+              type="email"
               required
-              placeholder="alex@creator.com" 
-              className="w-full bg-surface-container-high border-b border-outline-variant/40 border-t-0 border-x-0 focus:ring-0 focus:border-primary px-sm py-sm text-on-surface text-body-md rounded-t-sm" 
+              placeholder="alex@creator.com"
+              className="w-full bg-surface-container-high border-b border-outline-variant/40 border-t-0 border-x-0 focus:ring-0 focus:border-primary px-sm py-sm text-on-surface text-body-md rounded-t-sm"
             />
           </div>
           <div>
@@ -74,13 +116,13 @@ const LoginPage = () => {
                 <Link href="#" className="text-primary text-label-sm font-semibold hover:underline">Forgot?</Link>
               )}
             </div>
-            <input 
+            <input
               id="password"
               name="password"
-              type="password" 
+              type="password"
               required
-              placeholder="••••••••" 
-              className="w-full bg-surface-container-high border-b border-outline-variant/40 border-t-0 border-x-0 focus:ring-0 focus:border-primary px-sm py-sm text-on-surface text-body-md rounded-t-sm" 
+              placeholder="••••••••"
+              className="w-full bg-surface-container-high border-b border-outline-variant/40 border-t-0 border-x-0 focus:ring-0 focus:border-primary px-sm py-sm text-on-surface text-body-md rounded-t-sm"
             />
           </div>
 
@@ -93,7 +135,7 @@ const LoginPage = () => {
             </div>
           )}
 
-          <button 
+          <button
             type="submit"
             disabled={isPending}
             className="w-full py-sm bg-primary-container text-on-primary-container rounded-lg font-bold flex items-center justify-center gap-sm group hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
@@ -110,8 +152,10 @@ const LoginPage = () => {
 
         <p className="mt-lg text-center text-body-md text-on-surface-variant">
           {isLoginMode ? "Don't have an account? " : "Already have an account? "}
-          <button 
-            onClick={() => setIsLoginMode(!isLoginMode)} 
+          {/* type="button" is critical — without it, the browser treats this as type="submit" */}
+          <button
+            type="button"
+            onClick={toggleMode}
             className="text-primary font-semibold hover:underline"
           >
             {isLoginMode ? 'Create an account' : 'Log in instead'}

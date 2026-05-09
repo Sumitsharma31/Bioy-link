@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -65,9 +66,10 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
       >
         {/* Header — Logo + Close Button */}
         <div className="flex items-center justify-between mb-xl px-sm">
-          <span className="text-headline-sm font-bold text-on-surface tracking-tight">
-            Link-in-Bio
-          </span>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={40} height={40} className="object-contain drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]" />
+            <span className="text-headline-sm font-bold text-on-surface tracking-tight">BioLinks</span>
+          </Link>
           <button
             onClick={onClose}
             className="md:hidden p-xs text-on-surface-variant hover:text-on-surface transition-colors"

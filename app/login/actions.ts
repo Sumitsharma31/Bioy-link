@@ -72,3 +72,15 @@ export async function signup(prevState: any, formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/onboarding')
 }
+
+/**
+ * Combined action that reads a hidden 'mode' field ('login' | 'signup')
+ * so we never need to swap the action inside useActionState.
+ */
+export async function handleAuth(prevState: any, formData: FormData) {
+  const mode = formData.get('mode')
+  if (mode === 'signup') {
+    return signup(prevState, formData)
+  }
+  return login(prevState, formData)
+}

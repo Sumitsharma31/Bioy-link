@@ -7,7 +7,15 @@
 create table if not exists profiles (
   id uuid references auth.users not null primary key,
   updated_at timestamp with time zone default now(),
-  username text unique check (char_length(username) >= 3 and username ~ '^[a-z0-9_]+$'),
+  username text unique check (
+    char_length(username) >= 3 and
+    char_length(username) <= 30 and
+    username ~ '^[a-z0-9._]+$' and
+    username !~ '\.\.' and
+    username !~ '__' and
+    username !~ '^[._]' and
+    username !~ '[._]$'
+  ),
   full_name text,
   avatar_url text,
   bio text,
@@ -142,3 +150,28 @@ alter publication supabase_realtime add table appearance;
 create index if not exists links_profile_id_idx on links (profile_id);
 create index if not exists appearance_profile_id_idx on appearance (profile_id);
 create index if not exists links_clicks_idx on links (clicks desc);
+
+-- 6. USERNAME HISTORY TABLE
+-- Tracks previous usernames so old URLs can redirect to the new one.
+create table if not exists username_history (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  old_username text not null,
+  new_username text not null,
+  changed_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create index if not exists username_history_user_id_idx on username_history (user_id);
+create index if not exists username_history_old_username_idx on username_history (old_username);
+
+-- RLS for username_history
+alter table username_history enable row level security;
+
+drop policy if exists "History is viewable by everyone." on username_history;
+create policy "History is viewable by everyone." on username_history
+  for select using (true);
+
+drop policy if exists "Users can insert their own history." on username_history;
+create policy "Users can insert their own history." on username_history
+  for insert with check ((select auth.uid()) = user_id);
+

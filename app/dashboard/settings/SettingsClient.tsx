@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
-import { Shield, Trash2, CheckCircle, Loader2, Plus } from 'lucide-react';
-import { updateProfile } from './actions';
+import React, { useState, useTransition, useActionState } from 'react';
+import { Shield, Trash2, CheckCircle, Loader2, Plus, AtSign, AlertTriangle } from 'lucide-react';
+import { updateProfile, updateUsername, deleteAccount } from './actions';
+import UsernameInput from '@/components/username/UsernameInput';
 
 const tabs = ['Account', 'Profile', 'Billing', 'Custom Domain', 'Security'];
 
@@ -11,6 +12,7 @@ interface SettingsClientProps {
     email?: string;
   };
   profile: {
+    username?: string;
     full_name?: string;
     subscription_tier?: string;
     avatar_url?: string;
@@ -21,6 +23,12 @@ const SettingsClient = ({ user, profile }: SettingsClientProps) => {
   const [activeTab, setActiveTab] = useState('Account');
   const [isPending, startTransition] = useTransition();
   const [saveMessage, setSaveMessage] = useState('');
+  const [newUsernameReady, setNewUsernameReady] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  // @ts-ignore
+  const [usernameState, usernameAction, isUsernamePending] = useActionState(updateUsername, {});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(profile?.avatar_url || null);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,6 +188,45 @@ const SettingsClient = ({ user, profile }: SettingsClientProps) => {
             </button>
           </form>
 
+          {/* Change Username */}
+          <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-lg space-y-md">
+            <div className="flex items-center gap-md">
+              <AtSign size={18} className="text-primary-container" />
+              <h2 className="text-headline-sm text-on-surface">Change Username</h2>
+            </div>
+            <p className="text-body-md text-on-surface-variant">
+              Current username: <strong className="text-on-surface font-mono">@{profile?.username}</strong>
+            </p>
+
+            <form action={usernameAction} className="space-y-md">
+              <input type="hidden" name="new_username" value={newUsername} />
+              <UsernameInput
+                initialValue=""
+                planType={(profile?.subscription_tier === 'premium' ? 'premium' : 'free')}
+                domain="biolinks.me"
+                onValidChange={(u) => { setNewUsername(u); setNewUsernameReady(true); }}
+                inputName="_new_username_display"
+              />
+
+              {usernameState?.error && (
+                <p className="text-error text-label-md">{usernameState.error}</p>
+              )}
+              {usernameState?.success && (
+                <p className="text-primary text-label-md flex items-center gap-xs">
+                  <CheckCircle size={14} /> Username updated successfully!
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={!newUsernameReady || isUsernamePending}
+                className="flex items-center gap-sm bg-primary-container text-on-primary-container px-md py-sm rounded-lg font-bold text-label-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {isUsernamePending ? <Loader2 size={16} className="animate-spin" /> : 'Save Username'}
+              </button>
+            </form>
+          </div>
+
           {/* Security */}
           <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-lg space-y-md">
             <h2 className="text-headline-sm text-on-surface">Security Baseline</h2>
@@ -199,11 +246,47 @@ const SettingsClient = ({ user, profile }: SettingsClientProps) => {
 
           {/* Danger Zone */}
           <div className="border border-error/30 rounded-xl p-lg space-y-md">
-            <h2 className="text-headline-sm text-error">Danger Zone</h2>
-            <p className="text-body-md text-on-surface-variant">Once you delete your account, there is no going back. Please be certain.</p>
-            <button className="flex items-center gap-sm px-md py-sm bg-error-container text-on-error-container rounded-lg font-bold text-label-md hover:opacity-90 transition-opacity">
-              <Trash2 size={16} /> Delete Account
-            </button>
+            <div className="flex items-center gap-md">
+              <AlertTriangle size={18} className="text-error" />
+              <h2 className="text-headline-sm text-error">Danger Zone</h2>
+            </div>
+            <p className="text-body-md text-on-surface-variant">Once you delete your account, there is no going back. All your links, settings, and profile data will be permanently removed.</p>
+            
+            {confirmDelete ? (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-md p-md bg-error/5 border border-error/20 rounded-lg">
+                <p className="text-label-md text-error font-bold flex-1">Are you absolutely sure? This cannot be undone.</p>
+                <div className="flex gap-sm">
+                  <button 
+                    onClick={() => setConfirmDelete(false)}
+                    className="px-md py-sm bg-surface-container-high text-on-surface rounded-lg font-bold text-label-md hover:bg-surface-variant transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={async () => {
+                      setIsDeleting(true);
+                      const result = await deleteAccount();
+                      if (result?.error) {
+                        alert(result.error);
+                        setIsDeleting(false);
+                        setConfirmDelete(false);
+                      }
+                    }}
+                    disabled={isDeleting}
+                    className="flex items-center gap-sm px-md py-sm bg-error text-on-error rounded-lg font-bold text-label-md hover:bg-error/90 transition-all disabled:opacity-50"
+                  >
+                    {isDeleting ? <Loader2 size={16} className="animate-spin" /> : <><Trash2 size={16} /> Yes, Delete Everything</>}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setConfirmDelete(true)}
+                className="flex items-center gap-sm px-md py-sm bg-error-container text-on-error-container rounded-lg font-bold text-label-md hover:opacity-90 transition-opacity active:scale-95 transition-all"
+              >
+                <Trash2 size={16} /> Delete Account
+              </button>
+            )}
           </div>
         </div>
 

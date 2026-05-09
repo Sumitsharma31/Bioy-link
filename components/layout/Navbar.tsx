@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Bell } from 'lucide-react';
 
 const Navbar = () => {
@@ -8,30 +9,31 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-md sm:px-margin flex justify-between items-center h-16">
         {/* Left — Logo + Nav Links */}
         <div className="flex items-center gap-xl">
-          <Link href="/" className="text-headline-sm font-black text-on-surface tracking-tight">
-            Link-in-Bio
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={48} height={48} className="object-contain drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]" />
+            <span className="text-headline-sm font-black text-on-surface tracking-tight">BioLinks</span>
           </Link>
           <div className="hidden md:flex items-center gap-lg">
             <Link
-              href="#"
-              className="text-body-md text-primary font-bold border-b-2 border-primary pb-1 transition-colors duration-200"
+              href="/product"
+              className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200"
             >
               Product
             </Link>
             <Link
-              href="#"
+              href="/showcase"
               className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200"
             >
               Showcase
             </Link>
             <Link
-              href="#"
+              href="/pricing"
               className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200"
             >
               Pricing
             </Link>
             <Link
-              href="#"
+              href="/docs"
               className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200"
             >
               Docs
@@ -51,7 +53,7 @@ const Navbar = () => {
             Log In
           </Link>
           <Link
-            href="/login"
+            href="/login?mode=signup"
             className="bg-primary-container text-on-primary-container px-md py-sm rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all text-body-md"
           >
             Get Started

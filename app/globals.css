@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .min-h-dvh {
+    min-height: 100vh;          /* fallback */
+    min-height: 100dvh;         /* modern browsers */
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
 /* ═══════════════════════════════════════════════════════
    MONOCHROME BLUEPRINT — Design System Base Styles
    ═══════════════════════════════════════════════════════ */
