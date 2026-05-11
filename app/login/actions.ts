@@ -28,13 +28,22 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   // 2. Perform Login
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: validatedFields.data.email,
     password: validatedFields.data.password,
   })
 
   if (error) {
     return handleAuthError(error)
+  }
+
+  // 3. Check for MFA
+  if (data.session) {
+    const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (mfaData && mfaData.nextLevel === 'aal2' && mfaData.currentLevel === 'aal1') {
+      // User has 2FA enabled, must complete challenge
+      return { mfaRequired: true };
+    }
   }
 
   revalidatePath('/', 'layout')

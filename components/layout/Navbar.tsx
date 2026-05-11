@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Bell } from 'lucide-react';
+import { NavbarAuthButtons } from './NavbarAuthButtons';
 
+// Plain Server Component (no async here).
+// Auth-aware section is isolated in <NavbarAuthButtons> (an async Server Component).
+// This way Navbar is SAFE to import from other Server Components and layouts,
+// but must NEVER be imported directly from a 'use client' component.
 const Navbar = () => {
   return (
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant/20">
@@ -10,54 +14,44 @@ const Navbar = () => {
         {/* Left — Logo + Nav Links */}
         <div className="flex items-center gap-xl">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={48} height={48} className="object-contain drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]" />
+            <Image
+              src="/bioLink-Logo.png"
+              alt="BioLinks Logo"
+              width={48}
+              height={48}
+              className="object-contain drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]"
+            />
             <span className="text-headline-sm font-black text-on-surface tracking-tight">BioLinks</span>
           </Link>
           <div className="hidden md:flex items-center gap-lg">
-            <Link
-              href="/product"
-              className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200"
-            >
+            <Link href="/product" className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200">
               Product
             </Link>
-            <Link
-              href="/showcase"
-              className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200"
-            >
+            <Link href="/showcase" className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200">
               Showcase
             </Link>
-            <Link
-              href="/pricing"
-              className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200"
-            >
+            <Link href="/pricing" className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200">
               Pricing
             </Link>
-            <Link
-              href="/docs"
-              className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200"
-            >
+            <Link href="/docs" className="text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200">
               Docs
             </Link>
           </div>
         </div>
 
-        {/* Right — Actions */}
+        {/* Right — Auth-aware Actions (streamed in via Suspense) */}
         <div className="flex items-center gap-md">
-          <button className="text-on-surface-variant hover:text-on-surface transition-colors p-sm">
-            <Bell size={20} />
-          </button>
-          <Link
-            href="/login"
-            className="hidden sm:block text-body-md text-on-surface-variant font-medium hover:text-on-surface transition-colors duration-200 active:scale-95"
+          <Suspense
+            fallback={
+              // Placeholder keeps layout stable while auth resolves
+              <div className="flex gap-md">
+                <div className="h-9 w-16 rounded-lg bg-surface-container-high animate-pulse hidden sm:block" />
+                <div className="h-9 w-28 rounded-lg bg-surface-container-high animate-pulse" />
+              </div>
+            }
           >
-            Log In
-          </Link>
-          <Link
-            href="/login?mode=signup"
-            className="bg-primary-container text-on-primary-container px-md py-sm rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all text-body-md"
-          >
-            Get Started
-          </Link>
+            <NavbarAuthButtons />
+          </Suspense>
         </div>
       </div>
     </nav>

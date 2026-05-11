@@ -11,29 +11,24 @@ export default async function AnalyticsPage() {
     redirect('/login');
   }
 
-  // Fetch Profile for views and device stats
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('views, username, mobile_views, desktop_views, tablet_views')
-    .eq('id', user.id)
-    .single();
-
-  // Fetch Links for clicks
-  const { data: links } = await supabase
-    .from('links')
-    .select('*')
-    .eq('profile_id', user.id)
-    .order('clicks', { ascending: false });
+  // ✅ Step 1 — Profile and links fetched in parallel
+  const [
+    { data: profile },
+    { data: links },
+  ] = await Promise.all([
+    supabase.from('profiles').select('views, username, mobile_views, desktop_views, tablet_views').eq('id', user.id).single(),
+    supabase.from('links').select('*').eq('profile_id', user.id).order('clicks', { ascending: false }),
+  ]);
 
   return (
-    <AnalyticsClient 
-      profileViews={profile?.views || 0} 
+    <AnalyticsClient
+      profileViews={profile?.views || 0}
       deviceStats={{
         mobile: profile?.mobile_views || 0,
         desktop: profile?.desktop_views || 0,
         tablet: profile?.tablet_views || 0
       }}
-      initialLinks={links || []} 
+      initialLinks={links || []}
     />
   );
 }

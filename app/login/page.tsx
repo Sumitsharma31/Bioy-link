@@ -8,7 +8,7 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import { handleAuth } from './actions';
 import { createClient } from '@/lib/supabase/client';
 
-const initialState = { error: '', message: '' };
+const initialState: { error?: string; message?: string; mfaRequired?: boolean } = { error: '', message: '' };
 
 // Outer shell just provides the Suspense boundary needed by useSearchParams
 const LoginPage = () => {
@@ -57,6 +57,105 @@ const LoginForm = () => {
       },
     });
   };
+
+  // --- MFA Logic ---
+  const [mfaCode, setMfaCode] = useState('');
+  const [isMfaPending, setIsMfaPending] = useState(false);
+  const [mfaError, setMfaError] = useState('');
+
+  const handleMfaVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsMfaPending(true);
+    setMfaError('');
+    
+    const supabase = createClient();
+    
+    // 1. Get factors
+    const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
+    if (factorsError) {
+      setMfaError(factorsError.message);
+      setIsMfaPending(false);
+      return;
+    }
+    
+    const totpFactor = factorsData.totp.find(f => f.status === 'verified');
+    if (!totpFactor) {
+      setMfaError('No verified 2FA factor found.');
+      setIsMfaPending(false);
+      return;
+    }
+    
+    // 2. Challenge
+    const challenge = await supabase.auth.mfa.challenge({ factorId: totpFactor.id });
+    if (challenge.error) {
+      setMfaError(challenge.error.message);
+      setIsMfaPending(false);
+      return;
+    }
+    
+    // 3. Verify
+    const verify = await supabase.auth.mfa.verify({
+      factorId: totpFactor.id,
+      challengeId: challenge.data.id,
+      code: mfaCode
+    });
+    
+    if (verify.error) {
+      setMfaError('Invalid verification code. Please try again.');
+      setIsMfaPending(false);
+      return;
+    }
+    
+    // Success! Redirect.
+    router.push('/dashboard');
+    router.refresh();
+  };
+
+  if (state?.mfaRequired) {
+    return (
+      <div className="min-h-dvh bg-background flex items-center justify-center px-md pt-md pb-24 relative overflow-hidden">
+        <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
+        <div className="w-full max-w-[480px] bg-surface-container-low border border-outline-variant/30 rounded-xl p-xl shadow-2xl relative z-10">
+          <div className="flex flex-col items-center mb-xl">
+            <div className="w-16 h-16 flex items-center justify-center mb-lg">
+              <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />
+            </div>
+            <h1 className="text-headline-md text-on-surface mb-xs">Two-Factor Auth</h1>
+            <p className="text-body-md text-on-surface-variant text-center">
+              Enter the 6-digit code from your authenticator app to continue.
+            </p>
+          </div>
+
+          <form onSubmit={handleMfaVerify} className="space-y-lg">
+            <div>
+              <label className="block text-label-sm text-on-surface-variant uppercase mb-xs text-center">Verification Code</label>
+              <input 
+                type="text" 
+                maxLength={6}
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                required
+                className="w-full bg-surface-container-high border border-outline-variant/30 px-sm py-md text-on-surface text-center tracking-[0.5em] text-title-lg rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+              />
+            </div>
+
+            {mfaError && (
+              <p className="text-error text-body-md text-center">{mfaError}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={mfaCode.length !== 6 || isMfaPending}
+              className="w-full py-sm bg-primary-container text-on-primary-container rounded-lg font-bold flex items-center justify-center gap-sm hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
+            >
+              {isMfaPending ? <Loader2 size={18} className="animate-spin" /> : 'Verify & Log In'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-background flex items-center justify-center px-md pt-md pb-24 relative overflow-hidden">
@@ -113,7 +212,7 @@ const LoginForm = () => {
             <div className="flex justify-between items-center mb-xs">
               <label className="text-label-sm text-on-surface-variant uppercase" htmlFor="password">Password</label>
               {isLoginMode && (
-                <Link href="#" className="text-primary text-label-sm font-semibold hover:underline">Forgot?</Link>
+                <Link href="/forgot-password" className="text-primary text-label-sm font-semibold hover:underline">Forgot?</Link>
               )}
             </div>
             <input
@@ -126,12 +225,12 @@ const LoginForm = () => {
             />
           </div>
 
-          {state?.error && (
-            <p className="text-error text-body-md text-center">{state.error}</p>
+          {(state?.error || searchParams.get('error')) && (
+            <p className="text-error text-body-md text-center">{state?.error || searchParams.get('error')}</p>
           )}
-          {state?.message && (
+          {(state?.message || searchParams.get('message')) && (
             <div className="bg-primary-container/20 border border-primary/20 rounded-lg p-md">
-              <p className="text-primary text-body-md text-center">{state.message}</p>
+              <p className="text-primary text-body-md text-center">{state?.message || searchParams.get('message')}</p>
             </div>
           )}
 

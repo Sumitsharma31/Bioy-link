@@ -3,15 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Home, Compass, Zap, User, Bell } from 'lucide-react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import { Home, Compass, Zap, User } from 'lucide-react';
+
+// Navbar and Footer are rendered by app/(marketing)/layout.tsx (a Server Component).
+// This page stays 'use client' purely for framer-motion animations.
 
 const LandingPage = () => {
   return (
     <div className="wireframe-pattern min-h-screen">
-      <Navbar />
-
       <main className="pt-24 pb-20 md:pb-0">
         {/* Hero Section */}
         <section className="max-w-7xl mx-auto px-md sm:px-margin mb-lg md:mb-xl">
@@ -155,15 +154,9 @@ const LandingPage = () => {
                 <span className="text-body-md text-on-surface-variant">/month</span>
               </div>
               <ul className="flex-grow space-y-md mb-xl">
-                <li className="flex items-center gap-sm text-body-md text-on-surface-variant">
-                  <span className="text-sm">✓</span> 5 Core Links
-                </li>
-                <li className="flex items-center gap-sm text-body-md text-on-surface-variant">
-                  <span className="text-sm">✓</span> Basic Analytics
-                </li>
-                <li className="flex items-center gap-sm text-body-md text-on-surface-variant">
-                  <span className="text-sm">✓</span> Standard Branding
-                </li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> 5 Core Links</li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Basic Analytics</li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Standard Branding</li>
               </ul>
               <button className="w-full py-sm border border-outline-variant rounded-lg font-bold text-on-surface hover:bg-surface-variant transition-all">
                 Current Plan
@@ -181,18 +174,10 @@ const LandingPage = () => {
                 <span className="text-body-md text-on-surface-variant">/month</span>
               </div>
               <ul className="flex-grow space-y-md mb-xl">
-                <li className="flex items-center gap-sm text-body-md text-on-surface">
-                  <span className="text-primary text-sm">✓</span> Unlimited Links
-                </li>
-                <li className="flex items-center gap-sm text-body-md text-on-surface">
-                  <span className="text-primary text-sm">✓</span> Advanced Analytics
-                </li>
-                <li className="flex items-center gap-sm text-body-md text-on-surface">
-                  <span className="text-primary text-sm">✓</span> Custom Domain
-                </li>
-                <li className="flex items-center gap-sm text-body-md text-on-surface">
-                  <span className="text-primary text-sm">✓</span> Removal of Watermark
-                </li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface"><span className="text-primary text-sm">✓</span> Unlimited Links</li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface"><span className="text-primary text-sm">✓</span> Advanced Analytics</li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface"><span className="text-primary text-sm">✓</span> Custom Domain</li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface"><span className="text-primary text-sm">✓</span> Removal of Watermark</li>
               </ul>
               <button className="w-full py-sm bg-primary-container text-on-primary-container rounded-lg font-bold hover:opacity-90 transition-all">
                 Upgrade to Pro
@@ -207,15 +192,9 @@ const LandingPage = () => {
                 <span className="text-body-md text-on-surface-variant">/month</span>
               </div>
               <ul className="flex-grow space-y-md mb-xl">
-                <li className="flex items-center gap-sm text-body-md text-on-surface-variant">
-                  <span className="text-sm">✓</span> Priority Support
-                </li>
-                <li className="flex items-center gap-sm text-body-md text-on-surface-variant">
-                  <span className="text-sm">✓</span> Team Collaboration
-                </li>
-                <li className="flex items-center gap-sm text-body-md text-on-surface-variant">
-                  <span className="text-sm">✓</span> Multi-Page Management
-                </li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Priority Support</li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Team Collaboration</li>
+                <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Multi-Page Management</li>
               </ul>
               <button className="w-full py-sm border border-outline-variant rounded-lg font-bold text-on-surface hover:bg-surface-variant transition-all">
                 Contact Sales
@@ -224,8 +203,6 @@ const LandingPage = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
 
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 w-full z-50 bg-background/80 backdrop-blur-md border-t border-outline-variant/20 md:hidden h-16 flex items-center">

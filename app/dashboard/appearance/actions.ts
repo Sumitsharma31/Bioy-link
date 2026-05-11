@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 export async function saveAppearance(formData: FormData) {
   const supabase = await createClient()
@@ -37,6 +37,8 @@ export async function saveAppearance(formData: FormData) {
     .single()
 
   revalidatePath('/dashboard/appearance')
+  revalidateTag('appearance') // bust getCachedAppearance
+  revalidateTag('profile')    // bust getCachedProfile
   if (profile?.username) {
     revalidatePath(`/${profile.username}`)
   }

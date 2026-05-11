@@ -5,7 +5,7 @@
 
 -- 1. PROFILES TABLE
 create table if not exists profiles (
-  id uuid references auth.users not null primary key,
+  id uuid primary key references auth.users(id) on delete cascade,
   updated_at timestamp with time zone default now(),
   username text unique check (
     char_length(username) >= 3 and
@@ -20,6 +20,7 @@ create table if not exists profiles (
   avatar_url text,
   bio text,
   subscription_tier text default 'free',
+  timezone text default 'Asia/Kolkata',
   
   -- Analytics
   views integer default 0,
@@ -33,6 +34,7 @@ alter table profiles add column if not exists views integer default 0;
 alter table profiles add column if not exists mobile_views integer default 0;
 alter table profiles add column if not exists desktop_views integer default 0;
 alter table profiles add column if not exists tablet_views integer default 0;
+alter table profiles add column if not exists timezone text default 'Asia/Kolkata';
 
 -- RLS for Profiles
 alter table profiles enable row level security;

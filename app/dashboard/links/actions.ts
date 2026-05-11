@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { linkSchema } from '@/lib/validations'
 
 export async function addLink(formData: FormData) {
@@ -108,3 +108,50 @@ export async function updateLinkIcon(linkId: string, iconName: string) {
   revalidatePath('/[username]', 'page')
   return { success: true }
 }
+
+export async function updateBio(bio: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ bio: bio })
+    .eq('id', user.id)
+
+  if (error) {
+    console.error('Update bio error:', error)
+    return { error: 'Failed to update bio.' }
+  }
+
+  revalidatePath('/dashboard/links')
+  revalidatePath('/[username]', 'page')
+  revalidateTag('profile') // bust getCachedProfile — bio is a profile field
+  return { success: true }
+}
+
+export async function reorderLinks(linkIds: string[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Not authenticated' }
+
+  // We perform multiple updates. 
+  // In a high-traffic app, we might use a dedicated RPC or upsert.
+  // For this scale, sequential updates are fine.
+  const updates = linkIds.map((id, index) => 
+    supabase
+      .from('links')
+      .update({ order_index: index })
+      .eq('id', id)
+      .eq('profile_id', user.id)
+  )
+
+  await Promise.all(updates)
+
+  revalidatePath('/dashboard/links')
+  revalidatePath('/[username]', 'page')
+  return { success: true }
+}
+

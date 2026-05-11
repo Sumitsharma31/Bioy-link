@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   X,
+  Share2,
 } from 'lucide-react';
 
 const navItems = [
@@ -44,6 +45,29 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
     if (onClose) onClose();
   };
 
+  const handleShare = async () => {
+    if (!profile?.username) return;
+    const url = `${window.location.origin}/${profile.username}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'My BioLinks Profile',
+          url: url
+        });
+      } catch (err) {
+        // User cancelled or share failed
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('Profile link copied to clipboard!');
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+    }
+  };
+
   return (
     <>
       {/* Mobile Overlay Backdrop */}
@@ -64,18 +88,12 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
           md:translate-x-0
         `}
       >
-        {/* Header — Logo + Close Button */}
-        <div className="flex items-center justify-between mb-xl px-sm">
+        {/* Header — Logo */}
+        <div className="flex items-center mb-xl px-sm">
           <Link href="/" className="flex items-center gap-2">
             <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={40} height={40} className="object-contain drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]" />
             <span className="text-headline-sm font-bold text-on-surface tracking-tight">BioLinks</span>
           </Link>
-          <button
-            onClick={onClose}
-            className="md:hidden p-xs text-on-surface-variant hover:text-on-surface transition-colors"
-          >
-            <X size={20} />
-          </button>
         </div>
 
         {/* User Profile */}
@@ -123,15 +141,10 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
         {/* Bottom Actions */}
         <div className="mt-auto flex flex-col gap-sm border-t border-outline-variant/20 pt-md">
           <button
-            onClick={() => {
-              if (profile?.username) {
-                router.push(`/${profile.username}`);
-                handleNavClick();
-              }
-            }}
-            className="w-full bg-surface-container-highest text-on-surface py-sm rounded-lg text-label-md hover:bg-surface-bright transition-colors"
+            onClick={handleShare}
+            className="w-full bg-surface-container-highest text-on-surface py-sm rounded-lg text-label-md hover:bg-surface-bright transition-colors flex items-center justify-center gap-sm"
           >
-            View Live Page
+            <Share2 size={16} /> Share
           </button>
           <Link
             href="#"
@@ -153,13 +166,36 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
   );
 };
 
-export const MobileMenuButton = ({ onClick }: { onClick: () => void }) => (
+export const MobileMenuButton = ({ isOpen, onClick, className }: { isOpen: boolean; onClick: () => void; className?: string }) => (
   <button
     onClick={onClick}
-    className="md:hidden fixed top-md left-md z-30 w-10 h-10 bg-surface-container-high border border-outline-variant/30 rounded-lg flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors shadow-lg"
-    aria-label="Open menu"
+    className={`
+      md:hidden w-12 h-12 
+      rounded-2xl flex flex-col items-center justify-center gap-[4px]
+      transition-all duration-300 active:scale-90
+      ${isOpen 
+        ? 'bg-surface-container-highest shadow-none' 
+        : 'bg-primary-container text-on-primary-container shadow-[0_4px_20px_rgba(210,232,35,0.3)]'
+      }
+      ${className || ''}
+    `}
+    aria-label={isOpen ? "Close menu" : "Open menu"}
   >
-    <Menu size={20} />
+    <span 
+      className={`w-5 h-[2px] bg-current rounded-full transition-all duration-300 origin-center ${
+        isOpen ? 'rotate-45 translate-y-[6px]' : ''
+      }`} 
+    />
+    <span 
+      className={`w-5 h-[2px] bg-current rounded-full transition-all duration-300 ${
+        isOpen ? 'opacity-0 scale-x-0' : ''
+      }`} 
+    />
+    <span 
+      className={`w-5 h-[2px] bg-current rounded-full transition-all duration-300 origin-center ${
+        isOpen ? '-rotate-45 -translate-y-[6px]' : ''
+      }`} 
+    />
   </button>
 );
 

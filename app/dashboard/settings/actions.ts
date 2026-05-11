@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import cloudinary from '@/lib/cloudinary';
 import { validateUsername, normalizeUsername, RESERVED_USERNAMES } from '@/lib/username';
@@ -45,8 +45,25 @@ export async function updateProfile(formData: FormData) {
 
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/settings');
+  revalidateTag('profile'); // bust getCachedProfile
   return { success: true };
 }
+
+export async function removeAvatar() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Unauthorized');
+
+  const { error } = await supabase.from('profiles').update({ avatar_url: null }).eq('id', user.id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/settings');
+  revalidateTag('profile');
+  return { success: true };
+}
+
 
 // ─── Update Username ──────────────────────────────────────────────
 
@@ -118,6 +135,7 @@ export async function updateUsername(
 
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/settings');
+  revalidateTag('profile'); // bust getCachedProfile — username changed
   return { success: true };
 }
 
@@ -161,3 +179,62 @@ export async function deleteAccount() {
   redirect('/');
 }
 
+// ─── Update Preferences (timezone) ───────────────────────────────
+
+export async function updatePreferences(
+  prevState: any,
+  formData: FormData
+): Promise<{ success?: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Not authenticated.' };
+
+  const timezone = formData.get('timezone') as string;
+
+  if (!timezone) {
+    return { error: 'Timezone is required.' };
+  }
+
+  const { error } = await supabase.from('profiles').update({ timezone }).eq('id', user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/settings');
+  revalidateTag('profile');
+  return { success: true };
+}
+
+// ─── Update Password ──────────────────────────────────────────────
+
+export async function updatePassword(
+  prevState: any,
+  formData: FormData
+): Promise<{ success?: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Not authenticated.' };
+
+  const newPassword = formData.get('new_password') as string;
+  const confirmPassword = formData.get('confirm_password') as string;
+
+  if (!newPassword || newPassword.length < 6) {
+    return { error: 'Password must be at least 6 characters.' };
+  }
+
+  if (newPassword !== confirmPassword) {
+    return { error: 'Passwords do not match.' };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}
