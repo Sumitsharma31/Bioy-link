@@ -142,7 +142,7 @@ export default async function AdminPricingPage() {
   );
 }
 
-function TrendingUp({ size, className }: { size: number, className: string }) {
+function TrendingUp({ size, className }: { size: number, className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
