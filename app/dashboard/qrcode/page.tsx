@@ -12,12 +12,16 @@ export default async function QRCodePage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username')
+    .select('username, subscription_tier')
     .eq('id', user.id)
     .single();
 
   if (!profile) {
     redirect('/onboarding');
+  }
+
+  if (profile.subscription_tier === 'free') {
+    redirect('/pricing');
   }
 
   return <QRCodeClient username={profile.username} />;

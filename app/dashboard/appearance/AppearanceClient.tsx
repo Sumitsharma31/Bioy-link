@@ -4,6 +4,8 @@ import React, { useState, useTransition } from 'react';
 import { Check, Loader2 } from 'lucide-react';
 import { saveAppearance } from './actions';
 import Toast from '@/components/ui/Toast';
+import Link from 'next/link';
+import { Zap } from 'lucide-react';
 
 const themes = [
   { name: 'Modern Lime', bg: '#131313', card: '#1c1c1c', text: '#ffffff', accent: '#d2e823' },
@@ -21,6 +23,7 @@ export default function AppearanceClient({
   profile: any;
   links: any[];
 }) {
+  const isFree = profile?.subscription_tier === 'free';
   const [themePreset, setThemePreset] = useState(initialAppearance?.theme_preset || 'Modern Lime');
   const [buttonStyle, setButtonStyle] = useState(initialAppearance?.button_style || 'Rounded');
   const [fontFamily, setFontFamily] = useState(initialAppearance?.font_family || 'Inter');
@@ -74,23 +77,37 @@ export default function AppearanceClient({
         <div>
           <h2 className="text-headline-sm text-on-surface mb-md">Themes</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
-            {themes.map((theme) => (
-              <button
-                key={theme.name}
-                onClick={() => setThemePreset(theme.name)}
-                className={`bg-surface-container-low border rounded-xl p-md flex flex-col items-center gap-sm transition-all ${
-                  themePreset === theme.name ? 'border-primary-container shadow-md' : 'border-outline-variant/10 hover:border-outline-variant/40'
-                }`}
-              >
-                <div className="flex gap-xs">
-                  <div className="w-6 h-6 rounded-full border border-outline-variant/20" style={{ backgroundColor: theme.bg }} />
-                  <div className="w-6 h-6 rounded-full border border-outline-variant/20" style={{ backgroundColor: theme.card }} />
-                  <div className="w-6 h-6 rounded-full border border-outline-variant/20" style={{ backgroundColor: theme.accent }} />
+            {themes.map((theme) => {
+              const isProTheme = theme.name === 'Custom';
+              return (
+                <div key={theme.name} className="relative group">
+                  <button
+                    onClick={() => {
+                      if (isProTheme && isFree) {
+                        return;
+                      }
+                      setThemePreset(theme.name);
+                    }}
+                    className={`w-full bg-surface-container-low border rounded-xl p-md flex flex-col items-center gap-sm transition-all ${
+                      themePreset === theme.name ? 'border-primary-container shadow-md' : 'border-outline-variant/10 hover:border-outline-variant/40'
+                    } ${isProTheme && isFree ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                  >
+                    <div className="flex gap-xs">
+                      <div className="w-6 h-6 rounded-full border border-outline-variant/20" style={{ backgroundColor: theme.bg }} />
+                      <div className="w-6 h-6 rounded-full border border-outline-variant/20" style={{ backgroundColor: theme.card }} />
+                      <div className="w-6 h-6 rounded-full border border-outline-variant/20" style={{ backgroundColor: theme.accent }} />
+                    </div>
+                    <span className={`text-label-md ${themePreset === theme.name ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>{theme.name}</span>
+                    {themePreset === theme.name && <Check size={14} className="text-primary" />}
+                  </button>
+                  {isProTheme && isFree && (
+                    <Link href="/pricing" className="absolute top-1 right-1 bg-primary-container text-on-primary-container px-xs py-[2px] rounded text-[8px] font-bold uppercase tracking-tighter shadow-lg flex items-center gap-xs">
+                      <Zap size={8} /> Pro
+                    </Link>
+                  )}
                 </div>
-                <span className={`text-label-md ${themePreset === theme.name ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>{theme.name}</span>
-                {themePreset === theme.name && <Check size={14} className="text-primary" />}
-              </button>
-            ))}
+              );
+            })}
           </div>
         </div>
 

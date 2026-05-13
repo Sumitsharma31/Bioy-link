@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ExternalLink } from 'lucide-react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 
 const categories = ['All', 'Creator', 'Developer', 'Designer', 'Musician', 'Entrepreneur'];
 
@@ -32,7 +30,6 @@ export default function ShowcasePage() {
 
   return (
     <div className="wireframe-pattern min-h-screen">
-      <Navbar />
       <main className="pt-28 pb-24">
         <section className="max-w-7xl mx-auto px-md sm:px-margin mb-xl text-center">
           <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -114,7 +111,6 @@ export default function ShowcasePage() {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 }

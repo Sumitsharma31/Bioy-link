@@ -2,8 +2,6 @@
 
 import React from 'react';
 import { CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 
 const overallStatus = 'operational'; // 'operational' | 'degraded' | 'outage'
 
@@ -56,7 +54,6 @@ const overallConfig = statusConfig[overallStatus as keyof typeof statusConfig];
 export default function StatusPage() {
   return (
     <div className="min-h-screen bg-background wireframe-pattern">
-      <Navbar />
       <main className="pt-28 pb-24">
         <div className="max-w-4xl mx-auto px-md sm:px-margin">
           {/* Header */}
@@ -162,7 +159,6 @@ export default function StatusPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

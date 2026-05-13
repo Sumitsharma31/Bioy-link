@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MessageSquare, Zap, BookOpen, ArrowRight, CheckCircle } from 'lucide-react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 
 const channels = [
   { icon: Mail, title: 'Email Support', description: 'For billing, account issues, and general questions.', contact: 'hello@biolinks.io', action: 'mailto:hello@biolinks.io', label: 'Send Email', response: 'Typically replies within 4–8 hours' },
@@ -26,7 +24,6 @@ export default function ContactPage() {
 
   return (
     <div className="wireframe-pattern min-h-screen">
-      <Navbar />
       <main className="pt-28 pb-24">
         {/* Header */}
         <section className="max-w-7xl mx-auto px-md sm:px-margin mb-xl text-center">
@@ -128,7 +125,6 @@ export default function ContactPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 }

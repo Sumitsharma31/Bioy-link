@@ -16,5 +16,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
     .eq('id', user.id)
     .single();
 
-  return <DashboardLayout profile={profile}>{children}</DashboardLayout>;
+  return (
+    <DashboardLayout 
+      profile={profile ? { ...profile, email: user.email } : null}
+    >
+      {children}
+    </DashboardLayout>
+  );
 }

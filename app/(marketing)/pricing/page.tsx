@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight, Zap } from 'lucide-react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import Script from 'next/script';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const plans = [
   {
@@ -19,7 +20,7 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: { monthly: 12, annual: 9 },
+    price: { monthly: 49, annual: 39 },
     description: 'For creators serious about growth.',
     features: ['Unlimited Links', 'Advanced Analytics', 'Custom Domain', 'Remove Watermark', 'Priority Support', 'Branded QR Codes', 'Scheduled Links'],
     cta: 'Upgrade to Pro',
@@ -28,12 +29,12 @@ const plans = [
     badge: 'Most Popular',
   },
   {
-    name: 'Enterprise',
-    price: { monthly: 49, annual: 39 },
-    description: 'Built for teams and agencies.',
-    features: ['Everything in Pro', 'Team Collaboration', 'Multi-Page Management', 'API Access', 'White-label Solution', 'Dedicated Account Manager', 'Custom Contracts'],
-    cta: 'Contact Sales',
-    href: 'mailto:hello@biolinks.io',
+    name: 'Pro Max',
+    price: { monthly: 199, annual: 149 },
+    description: 'The ultimate power for professionals.',
+    features: ['Everything in Pro', 'Team Collaboration', 'Advanced Customization', 'API Access', 'White-label Solution', 'Priority Support 24/7', 'Detailed Insights'],
+    cta: 'Upgrade to Max',
+    href: '/login?mode=signup',
     highlight: false,
   },
 ];
@@ -54,10 +55,116 @@ const fadeUp = {
 export default function PricingPage() {
   const [annual, setAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [loading, setLoading] = useState<string | null>(null);
+  const supabase = createClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
+
+  const handleUpgrade = async (plan: any) => {
+    try {
+      setLoading(plan.name);
+
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push('/login?mode=signup');
+        return;
+      }
+
+      // Check if already pro
+      if (user.user_metadata?.subscription_tier === 'pro' && plan.name === 'Pro') {
+        alert('You are already on the Pro plan!');
+        return;
+      }
+
+      // 1. Create order
+      const res = await fetch('/api/razorpay/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: annual ? plan.price.annual : plan.price.monthly,
+          planName: plan.name,
+        }),
+      });
+
+      const order = await res.json();
+
+      if (order.error) throw new Error(order.error);
+
+      // 2. Open Razorpay Checkout
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'BioLinks',
+        description: `Upgrade to ${plan.name} Plan`,
+        order_id: order.id,
+        handler: async function (response: any) {
+          // 3. Verify payment
+          const verifyRes = await fetch('/api/razorpay/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...response,
+              planName: plan.name,
+              userId: user.id,
+            }),
+          });
+
+          const verifyData = await verifyRes.json();
+          if (verifyData.status === 'ok') {
+            alert('Payment successful! Your account has been upgraded.');
+            router.push('/dashboard');
+          } else {
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: {
+          name: user.user_metadata?.full_name || '',
+          email: user.email || '',
+        },
+        theme: {
+          color: '#d2e823',
+        },
+        modal: {
+          ondismiss: function() {
+            setLoading(null);
+            // Ensure scroll is restored if Razorpay failed to clean up
+            document.body.style.overflow = 'auto';
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error: any) {
+      console.error('Upgrade error:', error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  // ✅ Auto-trigger payment if URL has ?auto=true&plan=Pro
+  useEffect(() => {
+    const auto = searchParams.get('auto');
+    const planName = searchParams.get('plan');
+
+    if (auto === 'true' && planName === 'Pro' && !hasAutoTriggered) {
+      const proPlan = plans.find(p => p.name === 'Pro');
+      if (proPlan) {
+        setHasAutoTriggered(true);
+        
+        // Only trigger if we're reasonably sure they aren't already pro
+        // (handleUpgrade handles the heavy lifting of fetching user)
+        handleUpgrade(proPlan);
+      }
+    }
+  }, [searchParams, hasAutoTriggered]);
 
   return (
     <div className="wireframe-pattern min-h-screen">
-      <Navbar />
       <main className="pt-28 pb-24">
         {/* Header */}
         <section className="max-w-7xl mx-auto px-md sm:px-margin mb-xl text-center">
@@ -93,11 +200,10 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-md items-stretch">
             {plans.map((plan, i) => (
               <motion.div key={plan.name} custom={i} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-                className={`rounded-xl p-xl flex flex-col relative ${
-                  plan.highlight
+                className={`rounded-xl p-xl flex flex-col relative ${plan.highlight
                     ? 'bg-surface-container border-2 border-primary-container shadow-[0_0_40px_rgba(210,232,35,0.08)]'
                     : 'bg-surface-container-low border border-outline-variant/10'
-                }`}>
+                  }`}>
                 {plan.badge && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-container text-on-primary-container px-md py-xs rounded-full text-label-sm uppercase tracking-wider flex items-center gap-xs">
                     <Zap size={12} /> {plan.badge}
@@ -106,11 +212,11 @@ export default function PricingPage() {
                 <div className="mb-xl">
                   <span className={`text-label-sm uppercase tracking-wider font-bold ${plan.highlight ? 'text-primary' : 'text-on-surface-variant'}`}>{plan.name}</span>
                   <div className="flex items-baseline gap-xs mt-sm mb-xs">
-                    <span className="text-5xl font-black text-on-surface">${annual ? plan.price.annual : plan.price.monthly}</span>
+                    <span className="text-5xl font-black text-on-surface">₹{annual ? plan.price.annual : plan.price.monthly}</span>
                     <span className="text-body-md text-on-surface-variant">/mo</span>
                   </div>
                   {annual && plan.price.monthly > 0 && (
-                    <span className="text-label-sm text-emerald-400">Billed annually — save ${(plan.price.monthly - plan.price.annual) * 12}/yr</span>
+                    <span className="text-label-sm text-emerald-400">Billed annually — save ₹{(plan.price.monthly - plan.price.annual) * 12}/yr</span>
                   )}
                   <p className="text-body-md text-on-surface-variant mt-sm">{plan.description}</p>
                 </div>
@@ -122,14 +228,25 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href={plan.href}
-                  className={`w-full py-md rounded-lg font-bold text-center flex items-center justify-center gap-sm transition-all active:scale-95 ${
-                    plan.highlight
-                      ? 'bg-primary-container text-on-primary-container hover:opacity-90'
-                      : 'border border-outline-variant text-on-surface hover:bg-surface-variant'
-                  }`}>
-                  {plan.cta} {plan.highlight && <ArrowRight size={16} />}
-                </Link>
+                {plan.name === 'Standard' ? (
+                  <Link href={plan.href}
+                    className={`w-full py-md rounded-lg font-bold text-center flex items-center justify-center gap-sm transition-all active:scale-95 ${plan.highlight
+                        ? 'bg-primary-container text-on-primary-container hover:opacity-90'
+                        : 'border border-outline-variant text-on-surface hover:bg-surface-variant'
+                      }`}>
+                    {plan.cta} {plan.highlight && <ArrowRight size={16} />}
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => handleUpgrade(plan)}
+                    disabled={loading === plan.name}
+                    className={`w-full py-md rounded-lg font-bold text-center flex items-center justify-center gap-sm transition-all active:scale-95 disabled:opacity-50 ${plan.highlight
+                        ? 'bg-primary-container text-on-primary-container hover:opacity-90'
+                        : 'border border-outline-variant text-on-surface hover:bg-surface-variant'
+                      }`}>
+                    {loading === plan.name ? 'Processing...' : plan.cta} {plan.highlight && <ArrowRight size={16} />}
+                  </button>
+                )}
               </motion.div>
             ))}
           </div>
@@ -156,20 +273,9 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="max-w-7xl mx-auto px-md sm:px-margin">
-          <div className="bg-surface-container-low border border-primary-container/20 rounded-2xl p-xl md:p-[56px] flex flex-col md:flex-row items-center justify-between gap-xl">
-            <div>
-              <h2 className="text-headline-lg text-on-surface mb-sm">Start free. Grow without limits.</h2>
-              <p className="text-body-lg text-on-surface-variant">No credit card required. Cancel anytime.</p>
-            </div>
-            <Link href="/login?mode=signup" className="shrink-0 bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all flex items-center gap-sm">
-              Get Started Free <ArrowRight size={18} />
-            </Link>
-          </div>
-        </section>
+
       </main>
-      <Footer />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
     </div>
   );
 }

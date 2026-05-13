@@ -150,7 +150,7 @@ const LandingPage = () => {
             <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-xl flex flex-col h-full">
               <span className="text-label-sm uppercase tracking-wider text-on-surface-variant mb-sm">Standard</span>
               <div className="flex items-baseline gap-xs mb-md">
-                <span className="text-headline-lg text-on-surface">$0</span>
+                <span className="text-headline-lg text-on-surface">₹0</span>
                 <span className="text-body-md text-on-surface-variant">/month</span>
               </div>
               <ul className="flex-grow space-y-md mb-xl">
@@ -158,9 +158,9 @@ const LandingPage = () => {
                 <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Basic Analytics</li>
                 <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Standard Branding</li>
               </ul>
-              <button className="w-full py-sm border border-outline-variant rounded-lg font-bold text-on-surface hover:bg-surface-variant transition-all">
-                Current Plan
-              </button>
+              <Link href="/login?mode=signup" className="w-full py-sm border border-outline-variant rounded-lg font-bold text-on-surface hover:bg-surface-variant transition-all flex items-center justify-center">
+                Get Started
+              </Link>
             </div>
 
             {/* Pro — Highlighted */}
@@ -170,7 +170,7 @@ const LandingPage = () => {
               </span>
               <span className="text-label-sm uppercase tracking-wider text-primary mb-sm">Pro</span>
               <div className="flex items-baseline gap-xs mb-md">
-                <span className="text-headline-lg text-on-surface">$12</span>
+                <span className="text-headline-lg text-on-surface">₹49</span>
                 <span className="text-body-md text-on-surface-variant">/month</span>
               </div>
               <ul className="flex-grow space-y-md mb-xl">
@@ -179,16 +179,16 @@ const LandingPage = () => {
                 <li className="flex items-center gap-sm text-body-md text-on-surface"><span className="text-primary text-sm">✓</span> Custom Domain</li>
                 <li className="flex items-center gap-sm text-body-md text-on-surface"><span className="text-primary text-sm">✓</span> Removal of Watermark</li>
               </ul>
-              <button className="w-full py-sm bg-primary-container text-on-primary-container rounded-lg font-bold hover:opacity-90 transition-all">
+              <Link href="/pricing?plan=Pro&auto=true" className="w-full py-sm bg-primary-container text-on-primary-container rounded-lg font-bold hover:opacity-90 transition-all flex items-center justify-center">
                 Upgrade to Pro
-              </button>
+              </Link>
             </div>
 
             {/* Enterprise */}
             <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-xl flex flex-col h-full">
-              <span className="text-label-sm uppercase tracking-wider text-on-surface-variant mb-sm">Enterprise</span>
+              <span className="text-label-sm uppercase tracking-wider text-on-surface-variant mb-sm">Pro Max</span>
               <div className="flex items-baseline gap-xs mb-md">
-                <span className="text-headline-lg text-on-surface">$49</span>
+                <span className="text-headline-lg text-on-surface">₹199</span>
                 <span className="text-body-md text-on-surface-variant">/month</span>
               </div>
               <ul className="flex-grow space-y-md mb-xl">
@@ -196,9 +196,9 @@ const LandingPage = () => {
                 <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Team Collaboration</li>
                 <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Multi-Page Management</li>
               </ul>
-              <button className="w-full py-sm border border-outline-variant rounded-lg font-bold text-on-surface hover:bg-surface-variant transition-all">
-                Contact Sales
-              </button>
+              <Link href="/pricing?plan=Pro+Max&auto=true" className="w-full py-sm border border-outline-variant rounded-lg font-bold text-on-surface hover:bg-surface-variant transition-all flex items-center justify-center">
+                Upgrade to Max
+              </Link>
             </div>
           </div>
         </section>

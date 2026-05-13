@@ -2,12 +2,14 @@
 
 import React, { useActionState } from 'react';
 import Image from 'next/image';
-import { Loader2, KeyRound } from 'lucide-react';
+import { Loader2, KeyRound, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { resetPassword } from './actions';
 
 const initialState = { error: '', message: '' };
 
 const ResetPasswordPage = () => {
+  const router = useRouter();
   // @ts-ignore
   const [state, formAction, isPending] = useActionState(resetPassword, initialState);
 
@@ -16,6 +18,15 @@ const ResetPasswordPage = () => {
       <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
       
       <div className="w-full max-w-[480px] bg-surface-container-low border border-outline-variant/30 rounded-xl p-xl shadow-2xl relative z-10">
+        {/* Close Button Inside Card */}
+        <button 
+          onClick={() => router.back()}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-all group"
+          aria-label="Close"
+        >
+          <X size={20} className="group-active:scale-90 transition-transform" />
+        </button>
+
         <div className="flex flex-col items-center mb-xl text-center">
           <div className="w-16 h-16 flex items-center justify-center mb-lg">
             <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />

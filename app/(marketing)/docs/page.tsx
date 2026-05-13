@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Book, Zap, Settings, Globe, ChevronRight, Search } from 'lucide-react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 
 const categories = [
   {
@@ -83,7 +81,6 @@ export default function DocsPage() {
 
   return (
     <div className="wireframe-pattern min-h-screen">
-      <Navbar />
       <main className="pt-28 pb-24">
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-md sm:px-margin mb-xl text-center">
@@ -179,7 +176,6 @@ export default function DocsPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 }

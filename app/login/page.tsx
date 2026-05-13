@@ -4,9 +4,10 @@ import React, { useActionState, useState, Suspense, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, X } from 'lucide-react';
 import { handleAuth } from './actions';
 import { createClient } from '@/lib/supabase/client';
+import { ADMIN_EMAILS } from '@/lib/admins';
 
 const initialState: { error?: string; message?: string; mfaRequired?: boolean } = { error: '', message: '' };
 
@@ -48,15 +49,7 @@ const LoginForm = () => {
     router.push(`/login${nextIsLogin ? '' : '?mode=signup'}`, { scroll: false });
   };
 
-  const handleGoogleLogin = async () => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-  };
+
 
   // --- MFA Logic ---
   const [mfaCode, setMfaCode] = useState('');
@@ -107,7 +100,12 @@ const LoginForm = () => {
     }
     
     // Success! Redirect.
-    router.push('/dashboard');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email && ADMIN_EMAILS.includes(user.email)) {
+      router.push('/admin');
+    } else {
+      router.push('/dashboard');
+    }
     router.refresh();
   };
 
@@ -116,6 +114,15 @@ const LoginForm = () => {
       <div className="min-h-dvh bg-background flex items-center justify-center px-md pt-md pb-24 relative overflow-hidden">
         <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
         <div className="w-full max-w-[480px] bg-surface-container-low border border-outline-variant/30 rounded-xl p-xl shadow-2xl relative z-10">
+          {/* Close Button Inside Card */}
+          <button 
+            onClick={() => router.back()}
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-all group"
+            aria-label="Close"
+          >
+            <X size={20} className="group-active:scale-90 transition-transform" />
+          </button>
+
           <div className="flex flex-col items-center mb-xl">
             <div className="w-16 h-16 flex items-center justify-center mb-lg">
               <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />
@@ -161,6 +168,15 @@ const LoginForm = () => {
     <div className="min-h-dvh bg-background flex items-center justify-center px-md pt-md pb-24 relative overflow-hidden">
       <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
       <div className="w-full max-w-[480px] bg-surface-container-low border border-outline-variant/30 rounded-xl p-xl shadow-2xl relative z-10">
+        {/* Close Button Inside Card */}
+        <button 
+          onClick={() => router.back()}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-all group"
+          aria-label="Close"
+        >
+          <X size={20} className="group-active:scale-90 transition-transform" />
+        </button>
+
         <div className="flex flex-col items-center mb-xl">
           <div className="w-16 h-16 flex items-center justify-center mb-lg">
             <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />
@@ -173,17 +189,11 @@ const LoginForm = () => {
           </p>
         </div>
 
-        {/* OAuth Buttons */}
-        <div className="grid grid-cols-2 gap-md mb-lg">
-          <button type="button" onClick={handleGoogleLogin} className="flex items-center justify-center gap-sm py-sm px-md rounded-lg bg-surface-container-high border border-outline-variant/20 hover:bg-surface-variant transition-colors text-body-md font-medium">Google</button>
-          <button type="button" className="flex items-center justify-center gap-sm py-sm px-md rounded-lg bg-surface-container-high border border-outline-variant/20 hover:bg-surface-variant transition-colors text-body-md font-medium">Apple</button>
-        </div>
-
         <div className="relative mb-lg">
           <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-outline-variant/30" /></div>
           <div className="relative flex justify-center">
             <span className="bg-surface-container-low px-md text-label-sm uppercase tracking-widest text-on-surface-variant">
-              or continue with email
+              Login with Email
             </span>
           </div>
         </div>

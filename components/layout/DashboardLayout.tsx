@@ -11,6 +11,7 @@ interface DashboardLayoutProps {
     full_name?: string;
     username?: string;
     subscription_tier?: string;
+    email?: string;
   } | null;
 }
 

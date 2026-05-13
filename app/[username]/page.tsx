@@ -4,6 +4,7 @@ import {
   Instagram, Twitter, Linkedin, Github, Youtube, Facebook, 
   Phone, ShoppingBag, Video, Music, MessageCircle
 } from 'lucide-react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { notFound, redirect } from 'next/navigation';
 
@@ -100,7 +101,9 @@ export default async function PublicProfile({
     }
   };
 
-  const theme = getThemeStyles(appearance?.theme_preset);
+  const isFree = profile.subscription_tier === 'free';
+  const activeThemePreset = (appearance?.theme_preset === 'Custom' && isFree) ? 'Modern Lime' : appearance?.theme_preset;
+  const theme = getThemeStyles(activeThemePreset);
   const buttonRadius = appearance?.button_style === 'Sharp' ? '0px' : appearance?.button_style === 'Pill' ? '9999px' : '0.5rem';
   const fontFamily = appearance?.font_family !== 'Inter' ? `"${appearance?.font_family}", sans-serif` : undefined;
 
@@ -166,9 +169,11 @@ export default async function PublicProfile({
 
         {/* Footer */}
         <div className="mt-auto pt-xl flex flex-col items-center gap-md">
-          <span className="text-label-sm text-on-surface-variant/40 uppercase tracking-widest font-bold">
-            LINK-IN-BIO
-          </span>
+          {isFree && (
+            <Link href="/" className="text-label-sm text-on-surface-variant/40 uppercase tracking-widest font-black hover:text-on-surface-variant transition-colors">
+              Built with BioLinks
+            </Link>
+          )}
           <div className="flex gap-lg">
             <a href="#" className="flex items-center gap-xs text-[10px] text-on-surface-variant/50 hover:text-on-surface-variant transition-colors">
               <Flag size={10} /> Report

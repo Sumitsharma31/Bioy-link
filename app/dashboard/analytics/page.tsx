@@ -16,9 +16,13 @@ export default async function AnalyticsPage() {
     { data: profile },
     { data: links },
   ] = await Promise.all([
-    supabase.from('profiles').select('views, username, mobile_views, desktop_views, tablet_views').eq('id', user.id).single(),
+    supabase.from('profiles').select('views, username, mobile_views, desktop_views, tablet_views, subscription_tier').eq('id', user.id).single(),
     supabase.from('links').select('*').eq('profile_id', user.id).order('clicks', { ascending: false }),
   ]);
+
+  if (profile?.subscription_tier === 'free') {
+    redirect('/pricing');
+  }
 
   return (
     <AnalyticsClient

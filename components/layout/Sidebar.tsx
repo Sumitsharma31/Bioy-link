@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { ADMIN_EMAILS } from '@/lib/admins';
 import {
   LayoutDashboard,
   Link2,
@@ -16,6 +17,7 @@ import {
   Menu,
   X,
   Share2,
+  Shield,
 } from 'lucide-react';
 
 const navItems = [
@@ -34,6 +36,7 @@ interface SidebarProps {
     full_name?: string;
     username?: string;
     subscription_tier?: string;
+    email?: string;
   } | null;
 }
 
@@ -107,9 +110,16 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
             <span className="text-label-md text-on-surface font-bold truncate">
               {profile?.full_name || 'New Creator'}
             </span>
-            <span className="text-[10px] text-primary-fixed-dim uppercase tracking-widest font-bold">
-              {profile?.subscription_tier || 'Free'} Plan
-            </span>
+            <div className="flex items-center gap-xs">
+              <span className="text-[10px] text-primary-fixed-dim uppercase tracking-widest font-black">
+                {profile?.subscription_tier || 'Free'} Plan
+              </span>
+              {profile?.subscription_tier === 'free' && (
+                <Link href="/pricing" className="text-[8px] bg-primary-container text-on-primary-container px-xs py-[1px] rounded font-bold hover:opacity-80 transition-opacity">
+                  UPGRADE
+                </Link>
+              )}
+            </div>
           </div>
         </div>
 
@@ -136,6 +146,19 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
               </Link>
             );
           })}
+          
+          {/* Admin Link if authorized */}
+          {profile?.email && ADMIN_EMAILS.includes(profile.email) && (
+            <Link
+              href="/admin"
+              onClick={handleNavClick}
+              className={`flex items-center gap-md rounded-lg px-md py-sm transition-all duration-150 active:scale-[0.98] mt-auto border border-primary/20 bg-primary/5 text-primary hover:bg-primary/10`}
+            >
+              <Shield size={20} />
+              <span className="text-label-md font-bold uppercase tracking-wider">Admin Panel</span>
+            </Link>
+          )}
+
         </nav>
 
         {/* Bottom Actions */}

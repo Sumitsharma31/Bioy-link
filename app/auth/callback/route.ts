@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { ADMIN_EMAILS } from '@/lib/admins'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -9,19 +10,24 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error, data } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
-      const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+      // If no explicit redirect is set, redirect admins to /admin and others to /dashboard
+      let target = next;
+      if (next === '/dashboard' && data.user?.email && ADMIN_EMAILS.includes(data.user.email)) {
+        target = '/admin';
+      }
+
+      const forwardedHost = request.headers.get('x-forwarded-host') 
       const isLocalEnv = process.env.NODE_ENV === 'development'
       
       if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}`)
+        return NextResponse.redirect(`${origin}${target}`)
       } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+        return NextResponse.redirect(`https://${forwardedHost}${target}`)
       } else {
-        return NextResponse.redirect(`${origin}${next}`)
+        return NextResponse.redirect(`${origin}${target}`)
       }
     }
     

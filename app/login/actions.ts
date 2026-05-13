@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { authSchema } from '@/lib/validations'
 import { AuthError } from '@supabase/supabase-js'
+import { ADMIN_EMAILS } from '@/lib/admins'
 
 function handleAuthError(error: unknown) {
   if (error instanceof AuthError) {
@@ -47,6 +48,12 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
+  
+  // Redirect admins to the admin panel, others to the dashboard
+  if (data.user?.email && ADMIN_EMAILS.includes(data.user.email)) {
+    redirect('/admin')
+  }
+  
   redirect('/dashboard')
 }
 

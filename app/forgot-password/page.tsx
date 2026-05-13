@@ -3,12 +3,14 @@
 import React, { useActionState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Loader2, Send } from 'lucide-react';
+import { ArrowLeft, Loader2, Send, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { requestPasswordReset } from './actions';
 
 const initialState = { error: '', message: '' };
 
 const ForgotPasswordPage = () => {
+  const router = useRouter();
   // @ts-ignore
   const [state, formAction, isPending] = useActionState(requestPasswordReset, initialState);
 
@@ -17,6 +19,15 @@ const ForgotPasswordPage = () => {
       <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
       
       <div className="w-full max-w-[480px] bg-surface-container-low border border-outline-variant/30 rounded-xl p-xl shadow-2xl relative z-10">
+        {/* Close Button Inside Card */}
+        <button 
+          onClick={() => router.back()}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-all group"
+          aria-label="Close"
+        >
+          <X size={20} className="group-active:scale-90 transition-transform" />
+        </button>
+
         <Link 
           href="/login" 
           className="inline-flex items-center gap-xs text-label-sm text-on-surface-variant hover:text-primary transition-colors mb-xl group"

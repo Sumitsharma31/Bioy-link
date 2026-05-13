@@ -4,8 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { BarChart3, Palette, Link2, QrCode, Globe, Zap, Shield, ArrowRight, Check } from 'lucide-react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -74,8 +72,6 @@ const steps = [
 export default function ProductPage() {
   return (
     <div className="wireframe-pattern min-h-screen">
-      <Navbar />
-
       <main className="pt-28 pb-24">
         {/* Hero */}
         <section className="max-w-7xl mx-auto px-md sm:px-margin mb-xl text-center">
@@ -182,8 +178,6 @@ export default function ProductPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

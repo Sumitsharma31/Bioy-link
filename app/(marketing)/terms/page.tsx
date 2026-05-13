@@ -1,6 +1,4 @@
 import React from 'react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 
 const sections = [
   {
@@ -88,7 +86,6 @@ Address: BioLinks Inc., 123 Creator Ave, San Francisco, CA 94105`,
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main className="pt-28 pb-24">
         <div className="max-w-3xl mx-auto px-md sm:px-margin">
           {/* Header */}
@@ -124,7 +121,6 @@ export default function TermsPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

@@ -1,6 +1,4 @@
 import React from 'react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 
 const sections = [
   {
@@ -88,7 +86,6 @@ To exercise these rights, contact us at privacy@biolinks.io.`,
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main className="pt-28 pb-24">
         <div className="max-w-3xl mx-auto px-md sm:px-margin">
           {/* Header */}
@@ -124,7 +121,6 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
