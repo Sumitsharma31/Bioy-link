@@ -45,7 +45,7 @@ export async function updateProfile(formData: FormData) {
 
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/settings');
-  revalidateTag('profile'); // bust getCachedProfile
+  revalidateTag('profile', 'default'); // bust getCachedProfile
   return { success: true };
 }
 
@@ -60,7 +60,7 @@ export async function removeAvatar() {
 
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/settings');
-  revalidateTag('profile');
+  revalidateTag('profile', 'default');
   return { success: true };
 }
 
@@ -135,7 +135,7 @@ export async function updateUsername(
 
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/settings');
-  revalidateTag('profile'); // bust getCachedProfile — username changed
+  revalidateTag('profile', 'default'); // bust getCachedProfile — username changed
   return { success: true };
 }
 
@@ -204,7 +204,7 @@ export async function updatePreferences(
 
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/settings');
-  revalidateTag('profile');
+  revalidateTag('profile', 'default');
   return { success: true };
 }
 

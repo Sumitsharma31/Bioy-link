@@ -52,7 +52,7 @@ const LinksClient = ({ initialLinks, appearance, profile }: LinksClientProps) =>
   const [newLinkIcon, setNewLinkIcon] = useState('Globe');
   const [showNewIconPicker, setShowNewIconPicker] = useState(false);
   const iconPickerRef = useRef<HTMLDivElement>(null);
-  const linksListRef = useRef<HTMLDivElement>(null);
+  const linksListRef = useRef<HTMLUListElement>(null);
 
   const handleBioSave = () => {
     startTransition(async () => {

@@ -37,8 +37,8 @@ export async function saveAppearance(formData: FormData) {
     .single()
 
   revalidatePath('/dashboard/appearance')
-  revalidateTag('appearance') // bust getCachedAppearance
-  revalidateTag('profile')    // bust getCachedProfile
+  revalidateTag('appearance', 'default') // bust getCachedAppearance
+  revalidateTag('profile', 'default')    // bust getCachedProfile
   if (profile?.username) {
     revalidatePath(`/${profile.username}`)
   }

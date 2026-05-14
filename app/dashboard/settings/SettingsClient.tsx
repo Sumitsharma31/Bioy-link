@@ -120,7 +120,6 @@ const SettingsClient = ({ user, profile }: SettingsClientProps) => {
       title: 'Delete Image?',
       description: 'Are you sure you want to delete profile image?',
       type: 'warning',
-      autoClose: true,
       onConfirm: async () => {
         startTransition(async () => {
           try {

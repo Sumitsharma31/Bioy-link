@@ -109,7 +109,7 @@ const LoginForm = () => {
     router.refresh();
   };
 
-  if (state?.mfaRequired) {
+  if ((state as any)?.mfaRequired) {
     return (
       <div className="min-h-dvh bg-background flex items-center justify-center px-md pt-md pb-24 relative overflow-hidden">
         <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
@@ -235,12 +235,12 @@ const LoginForm = () => {
             />
           </div>
 
-          {(state?.error || searchParams.get('error')) && (
-            <p className="text-error text-body-md text-center">{state?.error || searchParams.get('error')}</p>
+          {((state as any)?.error || searchParams.get('error')) && (
+            <p className="text-error text-body-md text-center">{(state as any)?.error || searchParams.get('error')}</p>
           )}
-          {(state?.message || searchParams.get('message')) && (
+          {((state as any)?.message || searchParams.get('message')) && (
             <div className="bg-primary-container/20 border border-primary/20 rounded-lg p-md">
-              <p className="text-primary text-body-md text-center">{state?.message || searchParams.get('message')}</p>
+              <p className="text-primary text-body-md text-center">{(state as any)?.message || searchParams.get('message')}</p>
             </div>
           )}
 

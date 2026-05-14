@@ -127,7 +127,7 @@ export async function updateBio(bio: string) {
 
   revalidatePath('/dashboard/links')
   revalidatePath('/[username]', 'page')
-  revalidateTag('profile') // bust getCachedProfile — bio is a profile field
+  revalidateTag('profile', 'default') // bust getCachedProfile — bio is a profile field
   return { success: true }
 }
 
