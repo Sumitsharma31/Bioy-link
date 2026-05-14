@@ -8,6 +8,7 @@ import { ArrowRight, Loader2, X } from 'lucide-react';
 import { handleAuth } from './actions';
 import { createClient } from '@/lib/supabase/client';
 import { ADMIN_EMAILS } from '@/lib/admins';
+import Toast from '@/components/ui/Toast';
 
 const initialState: { error?: string; message?: string; mfaRequired?: boolean } = { error: '', message: '' };
 
@@ -55,6 +56,19 @@ const LoginForm = () => {
   const [mfaCode, setMfaCode] = useState('');
   const [isMfaPending, setIsMfaPending] = useState(false);
   const [mfaError, setMfaError] = useState('');
+  const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: 'success' | 'error' | 'info' }>({
+    isVisible: false,
+    message: '',
+    type: 'success'
+  });
+
+  useEffect(() => {
+    if ((state as any)?.error) {
+      setToast({ isVisible: true, message: (state as any).error, type: 'error' });
+    } else if ((state as any)?.message) {
+      setToast({ isVisible: true, message: (state as any).message, type: 'success' });
+    }
+  }, [state]);
 
   const handleMfaVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -274,6 +288,12 @@ const LoginForm = () => {
           <div className="w-1.5 h-1.5 bg-green-500 rounded-full" /> SECURE AES-256 ENCRYPTED LOGIN
         </div>
       </div>
+      <Toast 
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+      />
     </div>
   );
 };

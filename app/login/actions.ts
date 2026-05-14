@@ -9,7 +9,9 @@ import { ADMIN_EMAILS } from '@/lib/admins'
 
 function handleAuthError(error: unknown) {
   if (error instanceof AuthError) {
-    // Map specific Supabase errors to user-friendly messages if needed
+    if (error.message.includes('User already registered')) {
+      return { error: 'This email is already registered. Please sign in instead.' }
+    }
     return { error: error.message }
   }
   return { error: 'An unexpected error occurred. Please try again.' }
