@@ -141,6 +141,7 @@ function PricingContent() {
     } catch (error: any) {
       console.error('Upgrade error:', error);
       alert('Something went wrong. Please try again.');
+      document.body.style.overflow = 'auto';
     } finally {
       setLoading(null);
     }

@@ -115,13 +115,13 @@ const LoginForm = () => {
         <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
         <div className="w-full max-w-[480px] bg-surface-container-low border border-outline-variant/30 rounded-xl p-xl shadow-2xl relative z-10">
           {/* Close Button Inside Card */}
-          <button 
-            onClick={() => router.back()}
+          <Link 
+            href="/"
             className="absolute top-4 right-4 p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-all group"
             aria-label="Close"
           >
             <X size={20} className="group-active:scale-90 transition-transform" />
-          </button>
+          </Link>
 
           <div className="flex flex-col items-center mb-xl">
             <div className="w-16 h-16 flex items-center justify-center mb-lg">
@@ -169,13 +169,13 @@ const LoginForm = () => {
       <div className="absolute bottom-0 right-0 w-1/3 h-1/3 wireframe-pattern opacity-30 pointer-events-none" />
       <div className="w-full max-w-[480px] bg-surface-container-low border border-outline-variant/30 rounded-xl p-xl shadow-2xl relative z-10">
         {/* Close Button Inside Card */}
-        <button 
-          onClick={() => router.back()}
+        <Link 
+          href="/"
           className="absolute top-4 right-4 p-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-all group"
           aria-label="Close"
         >
           <X size={20} className="group-active:scale-90 transition-transform" />
-        </button>
+        </Link>
 
         <div className="flex flex-col items-center mb-xl">
           <div className="w-16 h-16 flex items-center justify-center mb-lg">
