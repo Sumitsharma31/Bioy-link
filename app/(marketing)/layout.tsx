@@ -5,12 +5,15 @@
 // server-only APIs (next/headers) into the client bundle.
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import MarketingPageWrapper from '@/components/layout/MarketingPageWrapper';
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      {children}
+      <MarketingPageWrapper>
+        {children}
+      </MarketingPageWrapper>
       <Footer />
     </>
   );

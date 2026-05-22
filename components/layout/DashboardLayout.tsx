@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar, { MobileMenuButton } from './Sidebar';
 
 interface DashboardLayoutProps {
@@ -17,6 +19,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children, profile }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-surface">
@@ -35,9 +38,18 @@ const DashboardLayout = ({ children, profile }: DashboardLayoutProps) => {
 
         {/* Main Content Workspace */}
         <main className="flex-1 h-full overflow-y-auto bg-background ml-0 md:ml-64 transition-all">
-          <div className="max-w-6xl mx-auto px-md py-lg md:px-lg md:py-xl space-y-xl">
-            {children}
-          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="max-w-6xl mx-auto px-md py-lg md:px-lg md:py-xl space-y-xl"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Home, Compass, Zap, User } from 'lucide-react';
 
@@ -33,7 +34,7 @@ const LandingPage = () => {
                   Build Your Page
                 </Link>
                 <Link
-                  href="/alexcreator"
+                  href="/demo"
                   className="border border-outline-variant text-on-surface px-xl py-md rounded-lg font-bold text-lg hover:bg-surface-variant active:scale-95 transition-all"
                 >
                   View Demo
@@ -47,17 +48,19 @@ const LandingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
             >
-              <div className="x-placeholder aspect-[4/3] rounded-xl overflow-hidden shadow-2xl relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-2/3 h-5/6 bg-background border border-outline-variant/40 rounded-t-2xl shadow-inner p-md">
-                    <div className="w-16 h-16 bg-surface-container rounded-full mx-auto mb-md" />
-                    <div className="space-y-sm">
-                      <div className="h-4 w-1/3 bg-surface-container mx-auto rounded" />
-                      <div className="h-10 w-full bg-surface-container rounded-lg" />
-                      <div className="h-10 w-full bg-surface-container rounded-lg" />
-                      <div className="h-10 w-full bg-surface-container rounded-lg" />
-                    </div>
-                  </div>
+              {/* Same card style as avatar cards */}
+              <div className="rounded-xl bg-surface-container-low border border-outline-variant/20 ring-1 ring-outline-variant/10 shadow-2xl p-md flex items-center justify-center">
+                <div className="w-full aspect-[4/3] rounded-lg overflow-hidden relative">
+                  <Image
+                    src="/hero-mockup.png"
+                    alt="BioLinks profile page preview"
+                    fill
+                    priority
+                    className="object-cover object-center rounded-lg"
+                    sizes="(max-width: 1024px) 0vw, 58vw"
+                  />
+                  {/* subtle corner vignette */}
+                  <div className="absolute inset-0 rounded-lg bg-gradient-to-t from-surface-container-low/40 via-transparent to-transparent pointer-events-none" />
                 </div>
               </div>
             </motion.div>
@@ -76,7 +79,17 @@ const LandingPage = () => {
                   Drag, drop, and configure components. From custom buttons to live analytics widgets, your page grows with your career.
                 </p>
               </div>
-              <div className="mt-xl h-48 x-placeholder rounded-lg" />
+              <div className="mt-xl h-48 rounded-lg overflow-hidden relative">
+                <Image
+                  src="/modular-architecture.png"
+                  alt="Modular Architecture — drag-and-drop component builder"
+                  fill
+                  className="object-cover object-top rounded-lg"
+                  sizes="(max-width: 768px) 100vw, 66vw"
+                />
+                {/* subtle bottom fade to blend with card */}
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/60 via-transparent to-transparent rounded-lg pointer-events-none" />
+              </div>
             </div>
 
             {/* Structural Data */}
@@ -88,7 +101,17 @@ const LandingPage = () => {
                   Deep insights into how your audience interacts with your links.
                 </p>
               </div>
-              <div className="mt-xl h-48 x-placeholder rounded-lg" />
+              <div className="mt-xl h-48 rounded-lg overflow-hidden relative">
+                <Image
+                  src="/structural-data.png"
+                  alt="Structural Data — link analytics dashboard"
+                  fill
+                  className="object-cover object-top rounded-lg"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+                {/* subtle bottom fade to blend with card */}
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/60 via-transparent to-transparent rounded-lg pointer-events-none" />
+              </div>
             </div>
 
             {/* Design System */}
@@ -125,13 +148,34 @@ const LandingPage = () => {
           <h2 className="text-headline-lg text-on-surface mb-xl text-center">
             Trusted by 10,000+ Architects of Culture
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-md">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-md">
+            {[
+              { src: '/avatar-1.png', name: 'Arjun Dev', role: 'Content Creator' },
+              { src: '/avatar-2.png', name: 'Zara Okafor', role: 'Photographer' },
+              { src: '/avatar-3.png', name: 'Liam Cole', role: 'Developer' },
+              { src: '/avatar-4.png', name: 'Sofia Reyes', role: 'Digital Artist' },
+              { src: '/avatar-5.png', name: 'Mia Chen', role: 'Influencer' },
+              { src: '/avatar-6.png', name: 'Omar Khalil', role: 'Musician' },
+            ].map((creator) => (
               <div
-                key={i}
-                className="aspect-square bg-surface-container-highest/20 rounded-lg flex items-center justify-center grayscale opacity-40 hover:opacity-100 hover:grayscale-0 transition-all border border-outline-variant/10"
+                key={creator.name}
+                className="flex flex-col items-center gap-sm group cursor-pointer"
               >
-                <div className="w-12 h-12 bg-surface-container rounded-full" />
+                <div className="w-full aspect-square rounded-xl overflow-hidden relative ring-1 ring-outline-variant/20 group-hover:ring-primary/40 transition-all duration-300">
+                  <Image
+                    src={creator.src}
+                    alt={creator.name}
+                    fill
+                    className="object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                  />
+                  {/* lime tint overlay that fades on hover */}
+                  <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-all duration-300 pointer-events-none" />
+                </div>
+                <div className="text-center">
+                  <p className="text-label-md text-on-surface font-bold truncate w-full">{creator.name}</p>
+                  <p className="text-[10px] text-on-surface-variant/60 uppercase tracking-wider">{creator.role}</p>
+                </div>
               </div>
             ))}
           </div>

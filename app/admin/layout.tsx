@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { LayoutDashboard, Users, CreditCard, Settings, LogOut, ShieldCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { ADMIN_EMAILS } from '@/lib/admins';
 
 export default async function AdminLayout({
   children,
@@ -13,7 +12,11 @@ export default async function AdminLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user || !ADMIN_EMAILS.includes(user.email || '')) {
+  // Simple protection: Check if user exists and has admin email
+  // In production, you'd check a 'role' column in the profiles table
+  const adminEmails = ['ssumi@example.com', 'ssumit10kr@gmail.com', 'csumitsharma31@gmail.com']; // Add user's email here
+
+  if (!user || !adminEmails.includes(user.email || '')) {
     redirect('/dashboard');
   }
 
