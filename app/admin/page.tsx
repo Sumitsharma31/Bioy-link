@@ -10,14 +10,48 @@ export default async function AdminDashboard() {
   const { count: proUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('subscription_tier', 'pro');
   const { count: maxUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('subscription_tier', 'pro max');
   
-  // Calculate revenue (₹49 for Pro, ₹199 for Pro Max)
-  const estimatedMRR = ((proUsers || 0) * 49) + ((maxUsers || 0) * 199);
+  // Fetch user growth from auth users
+  const { data: { users: authUsers } = {} } = await supabase.auth.admin.listUsers();
+  
+  // Calculate new users today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const newToday = authUsers?.filter(u => new Date(u.created_at) >= today).length || 0;
+
+  // Calculate monthly growth for the last 5 months
+  const monthlyData = [];
+  const monthLabels = [];
+  for (let i = 4; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const month = d.getMonth();
+    const year = d.getFullYear();
+    const count = authUsers?.filter(u => {
+      const date = new Date(u.created_at);
+      return date.getMonth() === month && date.getFullYear() === year;
+    }).length || 0;
+    
+    monthlyData.push(count);
+    monthLabels.push(d.toLocaleDateString('default', { month: 'short' }));
+  }
+  
+  // Normalize chart heights to max 100%
+  const maxMonthly = Math.max(...monthlyData, 1);
+  const normalizedData = monthlyData.map(count => (count / maxMonthly) * 100);
+
+  // Fetch pricing plans
+  const { data: pricingPlans } = await supabase.from('pricing_plans').select('*');
+  const proPrice = pricingPlans?.find(p => p.tier_name === 'pro')?.monthly_price || 49;
+  const maxPrice = pricingPlans?.find(p => p.tier_name === 'pro max')?.monthly_price || 199;
+
+  // Calculate revenue
+  const estimatedMRR = ((proUsers || 0) * proPrice) + ((maxUsers || 0) * maxPrice);
 
   const stats = [
     { label: 'Total Users', value: totalUsers || 0, icon: Users, color: 'text-blue-400', bg: 'bg-blue-400/10' },
     { label: 'Pro/Max Subs', value: (proUsers || 0) + (maxUsers || 0), icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
     { label: 'Estimated MRR', value: `₹${estimatedMRR}`, icon: CreditCard, color: 'text-purple-400', bg: 'bg-purple-400/10' },
-    { label: 'New Today', value: 0, icon: UserPlus, color: 'text-orange-400', bg: 'bg-orange-400/10' },
+    { label: 'New Today', value: newToday, icon: UserPlus, color: 'text-orange-400', bg: 'bg-orange-400/10' },
   ];
 
   return (
@@ -40,21 +74,18 @@ export default async function AdminDashboard() {
         <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-xl">
           <h3 className="text-headline-sm text-on-surface mb-lg">User Growth</h3>
           <div className="h-64 flex items-end gap-xs">
-            {/* Placeholder for chart */}
-            {[40, 60, 30, 80, 50, 90, 70, 100].map((h, i) => (
-              <div key={i} className="flex-1 bg-primary/20 rounded-t-sm hover:bg-primary transition-all relative group" style={{ height: `${h}%` }}>
+            {normalizedData.map((h, i) => (
+              <div key={i} className="flex-1 bg-primary/20 rounded-t-sm hover:bg-primary transition-all relative group" style={{ height: `${h || 2}%` }}>
                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-container-high px-xs py-[2px] rounded text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
-                   {h * 10}
+                   {monthlyData[i]}
                  </div>
               </div>
             ))}
           </div>
           <div className="flex justify-between mt-md text-label-sm text-on-surface-variant uppercase">
-            <span>Jan</span>
-            <span>Feb</span>
-            <span>Mar</span>
-            <span>Apr</span>
-            <span>May</span>
+            {monthLabels.map((label, i) => (
+              <span key={i}>{label}</span>
+            ))}
           </div>
         </div>
 

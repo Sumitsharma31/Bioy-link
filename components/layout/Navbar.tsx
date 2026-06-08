@@ -19,7 +19,7 @@ const Navbar = () => {
               alt="BioLinks Logo"
               width={48}
               height={48}
-              className="object-contain drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]"
+              className="object-contain w-auto h-auto drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]"
             />
             <span className="text-headline-sm font-black text-on-surface tracking-tight">BioLinks</span>
           </Link>

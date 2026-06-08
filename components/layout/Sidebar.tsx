@@ -94,7 +94,7 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
         {/* Header — Logo */}
         <div className="flex items-center mb-xl px-sm">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={40} height={40} className="object-contain drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]" />
+            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={40} height={40} className="object-contain w-auto h-auto drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]" />
             <span className="text-headline-sm font-bold text-on-surface tracking-tight">BioLinks</span>
           </Link>
         </div>

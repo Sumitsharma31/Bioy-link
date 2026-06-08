@@ -80,6 +80,16 @@ const DEMO_SOCIALS = [Globe, Twitter, Linkedin, Mail];
 export default function DemoPage() {
   const [activeTheme, setActiveTheme] = useState(THEMES[0]);
   const [activeButton, setActiveButton] = useState(BUTTON_STYLES[0]);
+  const [user, setUser] = useState<any>(null);
+
+  React.useEffect(() => {
+    async function fetchUser() {
+      const { createClient } = await import('@/lib/supabase/client');
+      const { data: { user } } = await createClient().auth.getUser();
+      setUser(user);
+    }
+    fetchUser();
+  }, []);
 
   return (
     <div className="wireframe-pattern min-h-screen">
@@ -205,10 +215,10 @@ export default function DemoPage() {
                 Ready to build your own? It takes under 2 minutes.
               </p>
               <Link
-                href="/login?mode=signup"
+                href={user ? "/dashboard" : "/login?mode=signup"}
                 className="flex items-center justify-center gap-sm bg-primary-container text-on-primary-container px-lg py-md rounded-lg font-bold text-body-lg hover:opacity-90 active:scale-95 transition-all"
               >
-                Build Your Page <ArrowRight size={18} />
+                {user ? "Go to Dashboard" : "Build Your Page"} <ArrowRight size={18} />
               </Link>
               <Link
                 href="/"

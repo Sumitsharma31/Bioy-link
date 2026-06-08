@@ -43,6 +43,7 @@ export default function NotFound() {
               src="/404-illustration.png"
               alt="Broken link — page not found"
               fill
+              sizes="(max-width: 768px) 100vw, 224px"
               priority
               className="object-cover rounded-xl"
             />

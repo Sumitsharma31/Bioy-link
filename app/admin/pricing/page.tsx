@@ -1,19 +1,23 @@
 import React from 'react';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { CreditCard, CheckCircle, Clock, Search, Filter } from 'lucide-react';
+import { CreditCard, CheckCircle, Clock, Search, Filter, TrendingUp } from 'lucide-react';
+import PricingConfigForm from '@/components/admin/PricingConfigForm';
 
 export default async function AdminPricingPage() {
   const supabase = await createAdminClient();
 
   // Fetch all premium users
-  const { data: premiumUsers, error } = await supabase
+  const { data: premiumUsers, error: usersError } = await supabase
     .from('profiles')
     .select('id, username, full_name, avatar_url, subscription_tier, updated_at')
     .in('subscription_tier', ['pro', 'pro max'])
     .order('updated_at', { ascending: false });
 
-  if (error) {
-    return <div className="text-error p-xl">Error fetching pro users: {error.message}</div>;
+  // Fetch pricing plans (handle error if table doesn't exist yet)
+  const { data: pricingPlans } = await supabase.from('pricing_plans').select('*');
+
+  if (usersError) {
+    return <div className="text-error p-xl">Error fetching pro users: {usersError.message}</div>;
   }
 
   return (
@@ -64,8 +68,11 @@ export default async function AdminPricingPage() {
         </div>
       </div>
 
+      {/* Pricing Configuration Form */}
+      <PricingConfigForm plans={pricingPlans} />
+
       {/* Pro Users Table */}
-      <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl overflow-hidden">
+      <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl overflow-hidden mt-xl">
         <div className="p-xl border-b border-outline-variant/10 flex items-center justify-between bg-surface/30">
           <h3 className="text-headline-sm text-on-surface">Premium Subscribers</h3>
           <div className="relative">
@@ -142,11 +149,4 @@ export default async function AdminPricingPage() {
   );
 }
 
-function TrendingUp({ size, className }: { size: number, className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-      <polyline points="16 7 22 7 22 13" />
-    </svg>
-  );
-}
+

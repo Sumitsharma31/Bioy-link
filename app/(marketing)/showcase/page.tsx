@@ -26,6 +26,17 @@ const fadeUp = {
 
 export default function ShowcasePage() {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [user, setUser] = useState<any>(null);
+
+  React.useEffect(() => {
+    async function fetchUser() {
+      const { createClient } = await import('@/lib/supabase/client');
+      const { data: { user } } = await createClient().auth.getUser();
+      setUser(user);
+    }
+    fetchUser();
+  }, []);
+
   const filtered = activeCategory === 'All' ? profiles : profiles.filter(p => p.category === activeCategory);
 
   return (
@@ -105,8 +116,8 @@ export default function ShowcasePage() {
               <h2 className="text-headline-lg text-on-surface mb-sm">Add your page to the showcase</h2>
               <p className="text-body-lg text-on-surface-variant">Create your BioLinks profile and join the community.</p>
             </div>
-            <Link href="/login?mode=signup" className="shrink-0 bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all flex items-center gap-sm">
-              Build Yours <ArrowRight size={18} />
+            <Link href={user ? "/dashboard" : "/login?mode=signup"} className="shrink-0 bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all flex items-center gap-sm">
+              {user ? "Go to Dashboard" : "Build Yours"} <ArrowRight size={18} />
             </Link>
           </div>
         </section>

@@ -139,7 +139,7 @@ const LoginForm = () => {
 
           <div className="flex flex-col items-center mb-xl">
             <div className="w-16 h-16 flex items-center justify-center mb-lg">
-              <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />
+              <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain w-auto h-auto drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />
             </div>
             <h1 className="text-headline-md text-on-surface mb-xs">Two-Factor Auth</h1>
             <p className="text-body-md text-on-surface-variant text-center">
@@ -193,7 +193,7 @@ const LoginForm = () => {
 
         <div className="flex flex-col items-center mb-xl">
           <div className="w-16 h-16 flex items-center justify-center mb-lg">
-            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />
+            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={80} height={80} className="object-contain w-auto h-auto drop-shadow-[0_0_12px_rgba(200,255,0,0.6)]" />
           </div>
           <h1 className="text-headline-md text-on-surface mb-xs">
             {isLoginMode ? 'Welcome back' : 'Create an account'}

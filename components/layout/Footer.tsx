@@ -8,7 +8,7 @@ const Footer = ({ className = '' }: { className?: string }) => {
       <div className="max-w-7xl mx-auto px-margin py-xl flex flex-col md:flex-row justify-between items-center gap-md">
         <div className="flex flex-col items-center md:items-start gap-xs">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={64} height={64} className="object-contain drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]" />
+            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={64} height={64} className="object-contain w-auto h-auto drop-shadow-[0_0_6px_rgba(200,255,0,0.5)]" />
             <span className="text-headline-sm text-on-surface font-black tracking-tight">BioLinks</span>
           </Link>
           <p className="text-label-sm uppercase tracking-wider text-on-surface-variant">

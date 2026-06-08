@@ -30,7 +30,7 @@ const DashboardLayout = ({ children, profile }: DashboardLayoutProps) => {
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between px-md py-sm bg-surface-container-low border-b border-outline-variant/20 z-40">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={32} height={32} className="object-contain" />
+            <Image src="/bioLink-Logo.png" alt="BioLinks Logo" width={32} height={32} className="object-contain w-auto h-auto" />
             <span className="text-headline-sm font-bold tracking-tight">BioLinks</span>
           </Link>
           <MobileMenuButton isOpen={sidebarOpen} onClick={() => setSidebarOpen(!sidebarOpen)} />

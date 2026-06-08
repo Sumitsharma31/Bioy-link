@@ -17,16 +17,19 @@ const themes = [
 export default function AppearanceClient({ 
   initialAppearance, 
   profile, 
-  links 
+  links,
+  backgroundImages = []
 }: { 
   initialAppearance: any;
   profile: any;
   links: any[];
+  backgroundImages?: any[];
 }) {
   const isFree = profile?.subscription_tier === 'free';
   const [themePreset, setThemePreset] = useState(initialAppearance?.theme_preset || 'Modern Lime');
   const [buttonStyle, setButtonStyle] = useState(initialAppearance?.button_style || 'Rounded');
   const [fontFamily, setFontFamily] = useState(initialAppearance?.font_family || 'Inter');
+  const [bgImageUrl, setBgImageUrl] = useState(initialAppearance?.bg_image_url || null);
   const [isPending, startTransition] = useTransition();
   const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: 'success' | 'error' | 'info' }>({
     isVisible: false,
@@ -41,6 +44,8 @@ export default function AppearanceClient({
         formData.append('theme_preset', themePreset);
         formData.append('button_style', buttonStyle);
         formData.append('font_family', fontFamily);
+        if (bgImageUrl) formData.append('bg_image_url', bgImageUrl);
+        else formData.append('bg_image_url', '');
         await saveAppearance(formData);
         setToast({ isVisible: true, message: 'Appearance updated successfully!', type: 'success' });
       } catch (error) {
@@ -111,6 +116,53 @@ export default function AppearanceClient({
           </div>
         </div>
 
+        {/* Backgrounds Section */}
+        {backgroundImages.length > 0 && (
+          <div>
+            <h2 className="text-headline-sm text-on-surface mb-md">Background Images</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
+              <button
+                onClick={() => setBgImageUrl(null)}
+                className={`w-full aspect-video bg-surface-container-low border rounded-xl flex items-center justify-center transition-all ${
+                  !bgImageUrl ? 'border-primary-container shadow-md' : 'border-outline-variant/10 hover:border-outline-variant/40'
+                }`}
+              >
+                <span className={`text-label-md ${!bgImageUrl ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>None</span>
+              </button>
+
+              {backgroundImages.map((bg: any) => {
+                const isProBg = bg.tier !== 'free';
+                return (
+                  <div key={bg.id} className="relative group">
+                    <button
+                      onClick={() => {
+                        if (isProBg && isFree) return;
+                        setBgImageUrl(bg.url);
+                      }}
+                      className={`w-full aspect-video rounded-xl overflow-hidden border transition-all relative ${
+                        bgImageUrl === bg.url ? 'border-primary-container shadow-md' : 'border-outline-variant/10 hover:border-outline-variant/40'
+                      } ${isProBg && isFree ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={bg.url} alt={bg.name} className="w-full h-full object-cover" />
+                      {bgImageUrl === bg.url && (
+                        <div className="absolute top-1 right-1 bg-surface-container-low rounded-full p-[2px]">
+                          <Check size={14} className="text-primary" />
+                        </div>
+                      )}
+                    </button>
+                    {isProBg && isFree && (
+                      <Link href="/pricing" className="absolute top-1 right-1 bg-primary-container text-on-primary-container px-xs py-[2px] rounded text-[8px] font-bold uppercase tracking-tighter shadow-lg flex items-center gap-xs">
+                        <Zap size={8} /> Pro
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Typography Section */}
         <div>
           <h2 className="text-headline-sm text-on-surface mb-md">Typography</h2>
@@ -169,9 +221,12 @@ export default function AppearanceClient({
                 
                 return (
                   <div 
-                    className="w-[260px] h-[500px] rounded-[36px] border-[6px] border-surface-container-high shadow-xl overflow-hidden flex flex-col items-center px-md py-lg transition-colors duration-300" 
+                    className="w-[260px] h-[500px] rounded-[36px] border-[6px] border-surface-container-high shadow-xl overflow-hidden flex flex-col items-center px-md py-lg transition-colors duration-300 relative" 
                     style={{ 
                       backgroundColor: bg,
+                      backgroundImage: bgImageUrl ? `url(${bgImageUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
                       fontFamily: fontFamily !== 'Inter' ? `"${fontFamily}", sans-serif` : undefined 
                     }}
                   >

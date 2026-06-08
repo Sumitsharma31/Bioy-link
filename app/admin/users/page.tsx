@@ -9,7 +9,7 @@ export default async function AdminUsersPage() {
   const { data: users, error } = await supabase
     .from('profiles')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('updated_at', { ascending: false })
     .limit(50);
 
   if (error) {
@@ -38,9 +38,9 @@ export default async function AdminUsersPage() {
       </div>
 
       <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
+        <div className="overflow-x-hidden md:overflow-x-auto">
+          <table className="w-full text-left border-collapse block md:table">
+            <thead className="hidden md:table-header-group">
               <tr className="bg-surface-container-high/50 text-label-sm uppercase tracking-wider text-on-surface-variant border-b border-outline-variant/10">
                 <th className="px-xl py-md font-bold">User Information</th>
                 <th className="px-xl py-md font-bold">Subscription</th>
@@ -49,25 +49,31 @@ export default async function AdminUsersPage() {
                 <th className="px-xl py-md font-bold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-outline-variant/10">
+            <tbody className="block md:table-row-group divide-y divide-outline-variant/10">
               {users?.map((user) => (
-                <tr key={user.id} className="hover:bg-surface-variant/20 transition-colors group">
-                  <td className="px-xl py-md">
+                <tr key={user.id} className="block md:table-row hover:bg-surface-variant/20 transition-colors group p-md md:p-0 relative">
+                  <td className="block md:table-cell px-md md:px-xl py-sm md:py-md">
                     <div className="flex items-center gap-md">
-                      <div className="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/20 overflow-hidden flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/20 overflow-hidden flex items-center justify-center shrink-0">
                         {user.avatar_url ? (
                           <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-primary font-bold">{user.username?.[0]?.toUpperCase()}</span>
                         )}
                       </div>
-                      <div>
-                        <p className="text-body-md font-bold text-on-surface">{user.full_name || 'Anonymous'}</p>
-                        <p className="text-label-sm text-on-surface-variant">@{user.username}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-body-md font-bold text-on-surface truncate">{user.full_name || 'Anonymous'}</p>
+                        <p className="text-label-sm text-on-surface-variant truncate">@{user.username}</p>
+                      </div>
+                      <div className="md:hidden">
+                        <button className="text-on-surface-variant hover:text-on-surface transition-colors p-sm rounded-lg hover:bg-surface-container-high">
+                          <MoreVertical size={18} />
+                        </button>
                       </div>
                     </div>
                   </td>
-                  <td className="px-xl py-md">
+                  <td className="flex justify-between items-center md:table-cell px-md md:px-xl py-xs md:py-md">
+                    <span className="md:hidden text-label-sm text-on-surface-variant uppercase font-bold tracking-wider">Plan</span>
                     <span className={`text-label-sm px-sm py-[2px] rounded uppercase font-bold tracking-wider ${
                       user.subscription_tier === 'pro' 
                         ? 'bg-primary-container text-on-primary-container' 
@@ -76,21 +82,25 @@ export default async function AdminUsersPage() {
                       {user.subscription_tier}
                     </span>
                   </td>
-                  <td className="px-xl py-md text-body-sm text-on-surface-variant">
-                    {user.timezone || 'UTC'}
+                  <td className="flex justify-between items-center md:table-cell px-md md:px-xl py-xs md:py-md text-body-sm text-on-surface-variant">
+                    <span className="md:hidden text-label-sm text-on-surface-variant uppercase font-bold tracking-wider">Timezone</span>
+                    <span>{user.timezone || 'UTC'}</span>
                   </td>
-                  <td className="px-xl py-md text-body-sm text-on-surface-variant">
-                    {new Date(user.created_at).toLocaleDateString()}
+                  <td className="flex justify-between items-center md:table-cell px-md md:px-xl py-xs md:py-md text-body-sm text-on-surface-variant">
+                    <span className="md:hidden text-label-sm text-on-surface-variant uppercase font-bold tracking-wider">Joined</span>
+                    <span>{new Date(user.updated_at || Date.now()).toLocaleDateString()}</span>
                   </td>
-                  <td className="px-xl py-md text-right">
-                    <div className="flex items-center justify-end gap-md">
-                      <button className="text-on-surface-variant hover:text-primary transition-colors p-sm rounded-lg hover:bg-surface-container-high" title="Send Email">
+                  <td className="block md:table-cell px-md md:px-xl py-sm md:py-md mt-sm md:mt-0 border-t border-outline-variant/5 md:border-none">
+                    <div className="flex items-center justify-around md:justify-end gap-md">
+                      <button className="flex items-center justify-center gap-xs flex-1 md:flex-none text-on-surface-variant hover:text-primary transition-colors p-sm rounded-lg hover:bg-surface-container-high bg-surface-container md:bg-transparent" title="Send Email">
                         <Mail size={18} />
+                        <span className="md:hidden text-label-sm font-bold">Email</span>
                       </button>
-                      <button className="text-on-surface-variant hover:text-error transition-colors p-sm rounded-lg hover:bg-surface-container-high" title="Delete User">
+                      <button className="flex items-center justify-center gap-xs flex-1 md:flex-none text-on-surface-variant hover:text-error transition-colors p-sm rounded-lg hover:bg-surface-container-high bg-surface-container md:bg-transparent" title="Delete User">
                         <Trash2 size={18} />
+                        <span className="md:hidden text-label-sm font-bold">Delete</span>
                       </button>
-                      <button className="text-on-surface-variant hover:text-on-surface transition-colors p-sm rounded-lg hover:bg-surface-container-high">
+                      <button className="hidden md:flex text-on-surface-variant hover:text-on-surface transition-colors p-sm rounded-lg hover:bg-surface-container-high">
                         <MoreVertical size={18} />
                       </button>
                     </div>

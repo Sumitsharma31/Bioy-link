@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -10,6 +10,31 @@ import { Home, Compass, Zap, User } from 'lucide-react';
 // This page stays 'use client' purely for framer-motion animations.
 
 const LandingPage = () => {
+  const [proPrice, setProPrice] = useState(49);
+  const [maxPrice, setMaxPrice] = useState(199);
+  const [user, setUser] = useState<any>(null);
+
+  React.useEffect(() => {
+    async function fetchData() {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      
+      // Fetch user
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+
+      // Fetch pricing
+      const { data } = await supabase.from('pricing_plans').select('*');
+      if (data) {
+        const pro = data.find(p => p.tier_name === 'pro');
+        const max = data.find(p => p.tier_name === 'pro max');
+        if (pro) setProPrice(pro.monthly_price);
+        if (max) setMaxPrice(max.monthly_price);
+      }
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="wireframe-pattern min-h-screen">
       <main className="pt-24 pb-20 md:pb-0">
@@ -27,18 +52,29 @@ const LandingPage = () => {
                 A high-fidelity workspace for creators and freelancers to architect their presence. Connect everything you do in a single, minimal ecosystem.
               </p>
               <div className="flex gap-md mt-md flex-wrap">
-                <Link
-                  href="/login?mode=signup"
-                  className="bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all"
-                >
-                  Build Your Page
-                </Link>
-                <Link
-                  href="/demo"
-                  className="border border-outline-variant text-on-surface px-xl py-md rounded-lg font-bold text-lg hover:bg-surface-variant active:scale-95 transition-all"
-                >
-                  View Demo
-                </Link>
+                {user ? (
+                  <Link
+                    href="/dashboard"
+                    className="bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all"
+                  >
+                    Go to Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login?mode=signup"
+                      className="bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all"
+                    >
+                      Build Your Page
+                    </Link>
+                    <Link
+                      href="/demo"
+                      className="border border-outline-variant text-on-surface px-xl py-md rounded-lg font-bold text-lg hover:bg-surface-variant active:scale-95 transition-all"
+                    >
+                      View Demo
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 
@@ -48,20 +84,15 @@ const LandingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
             >
-              {/* Same card style as avatar cards */}
-              <div className="rounded-xl bg-surface-container-low border border-outline-variant/20 ring-1 ring-outline-variant/10 shadow-2xl p-md flex items-center justify-center">
-                <div className="w-full aspect-[4/3] rounded-lg overflow-hidden relative">
-                  <Image
-                    src="/hero-mockup.png"
-                    alt="BioLinks profile page preview"
-                    fill
-                    priority
-                    className="object-cover object-center rounded-lg"
-                    sizes="(max-width: 1024px) 0vw, 58vw"
-                  />
-                  {/* subtle corner vignette */}
-                  <div className="absolute inset-0 rounded-lg bg-gradient-to-t from-surface-container-low/40 via-transparent to-transparent pointer-events-none" />
-                </div>
+              <div className="aspect-[4/3] rounded-xl relative flex items-center justify-center">
+                <Image
+                  src="/hero-mockup.png"
+                  alt="BioLinks Digital Identity Blueprint"
+                  fill
+                  priority
+                  className="object-contain drop-shadow-[0_0_40px_rgba(210,232,35,0.2)]"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
               </div>
             </motion.div>
           </div>
@@ -150,31 +181,20 @@ const LandingPage = () => {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-md">
             {[
-              { src: '/avatar-1.png', name: 'Arjun Dev', role: 'Content Creator' },
-              { src: '/avatar-2.png', name: 'Zara Okafor', role: 'Photographer' },
-              { src: '/avatar-3.png', name: 'Liam Cole', role: 'Developer' },
-              { src: '/avatar-4.png', name: 'Sofia Reyes', role: 'Digital Artist' },
-              { src: '/avatar-5.png', name: 'Mia Chen', role: 'Influencer' },
-              { src: '/avatar-6.png', name: 'Omar Khalil', role: 'Musician' },
-            ].map((creator) => (
-              <div
-                key={creator.name}
-                className="flex flex-col items-center gap-sm group cursor-pointer"
-              >
-                <div className="w-full aspect-square rounded-xl overflow-hidden relative ring-1 ring-outline-variant/20 group-hover:ring-primary/40 transition-all duration-300">
-                  <Image
-                    src={creator.src}
-                    alt={creator.name}
-                    fill
-                    className="object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                  />
-                  {/* lime tint overlay that fades on hover */}
-                  <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-all duration-300 pointer-events-none" />
+              { name: 'Arjun Dev', role: 'CONTENT CREATOR', image: '/avatar-1.png' },
+              { name: 'Zara Okafor', role: 'PHOTOGRAPHER', image: '/avatar-2.png' },
+              { name: 'Liam Cole', role: 'DEVELOPER', image: '/avatar-3.png' },
+              { name: 'Sofia Reyes', role: 'DIGITAL ARTIST', image: '/avatar-4.png' },
+              { name: 'Mia Chen', role: 'INFLUENCER', image: '/avatar-5.png' },
+              { name: 'Omar Khalil', role: 'MUSICIAN', image: '/avatar-6.png' },
+            ].map((user, i) => (
+              <div key={i} className="flex flex-col items-center gap-sm group">
+                <div className="aspect-square w-full relative rounded-lg overflow-hidden border border-outline-variant/10 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:border-primary/50 transition-all duration-300 cursor-pointer">
+                  <Image src={user.image} alt={user.name} fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw" />
                 </div>
                 <div className="text-center">
-                  <p className="text-label-md text-on-surface font-bold truncate w-full">{creator.name}</p>
-                  <p className="text-[10px] text-on-surface-variant/60 uppercase tracking-wider">{creator.role}</p>
+                  <div className="text-body-md font-bold text-on-surface">{user.name}</div>
+                  <div className="text-[10px] tracking-widest uppercase text-on-surface-variant font-bold">{user.role}</div>
                 </div>
               </div>
             ))}
@@ -202,8 +222,8 @@ const LandingPage = () => {
                 <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Basic Analytics</li>
                 <li className="flex items-center gap-sm text-body-md text-on-surface-variant"><span className="text-sm">✓</span> Standard Branding</li>
               </ul>
-              <Link href="/login?mode=signup" className="w-full py-sm border border-outline-variant rounded-lg font-bold text-on-surface hover:bg-surface-variant transition-all flex items-center justify-center">
-                Get Started
+              <Link href={user ? "/dashboard" : "/login?mode=signup"} className="w-full py-sm border border-outline-variant rounded-lg font-bold text-on-surface hover:bg-surface-variant transition-all flex items-center justify-center">
+                {user ? "Dashboard" : "Get Started"}
               </Link>
             </div>
 
@@ -214,7 +234,7 @@ const LandingPage = () => {
               </span>
               <span className="text-label-sm uppercase tracking-wider text-primary mb-sm">Pro</span>
               <div className="flex items-baseline gap-xs mb-md">
-                <span className="text-headline-lg text-on-surface">₹49</span>
+                <span className="text-headline-lg text-on-surface">₹{proPrice}</span>
                 <span className="text-body-md text-on-surface-variant">/month</span>
               </div>
               <ul className="flex-grow space-y-md mb-xl">
@@ -232,7 +252,7 @@ const LandingPage = () => {
             <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-xl flex flex-col h-full">
               <span className="text-label-sm uppercase tracking-wider text-on-surface-variant mb-sm">Pro Max</span>
               <div className="flex items-baseline gap-xs mb-md">
-                <span className="text-headline-lg text-on-surface">₹199</span>
+                <span className="text-headline-lg text-on-surface">₹{maxPrice}</span>
                 <span className="text-body-md text-on-surface-variant">/month</span>
               </div>
               <ul className="flex-grow space-y-md mb-xl">
@@ -263,9 +283,9 @@ const LandingPage = () => {
             <Zap size={20} />
             <span className="text-[10px]">Pricing</span>
           </Link>
-          <Link href="/login" className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+          <Link href={user ? "/dashboard" : "/login"} className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
             <User size={20} />
-            <span className="text-[10px]">Account</span>
+            <span className="text-[10px]">{user ? "Dashboard" : "Account"}</span>
           </Link>
         </div>
       </nav>

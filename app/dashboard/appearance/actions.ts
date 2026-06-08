@@ -12,6 +12,7 @@ export async function saveAppearance(formData: FormData) {
   const themePreset = formData.get('theme_preset') as string
   const buttonStyle = formData.get('button_style') as string
   const fontFamily = formData.get('font_family') as string
+  const bgImageUrl = formData.get('bg_image_url') as string
 
   // Upsert the appearance row
   const { error } = await supabase
@@ -21,6 +22,7 @@ export async function saveAppearance(formData: FormData) {
       theme_preset: themePreset || 'Modern Lime',
       button_style: buttonStyle || 'Rounded',
       font_family: fontFamily || 'Inter',
+      bg_image_url: bgImageUrl || null,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'profile_id' })
 

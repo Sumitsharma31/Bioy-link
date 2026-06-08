@@ -70,6 +70,17 @@ const steps = [
 ];
 
 export default function ProductPage() {
+  const [user, setUser] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    async function fetchUser() {
+      const { createClient } = await import('@/lib/supabase/client');
+      const { data: { user } } = await createClient().auth.getUser();
+      setUser(user);
+    }
+    fetchUser();
+  }, []);
+
   return (
     <div className="wireframe-pattern min-h-screen">
       <main className="pt-28 pb-24">
@@ -99,8 +110,8 @@ export default function ProductPage() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
             className="flex gap-md justify-center flex-wrap"
           >
-            <Link href="/login?mode=signup" className="bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all flex items-center gap-sm">
-              Start Free <ArrowRight size={18} />
+            <Link href={user ? "/dashboard" : "/login?mode=signup"} className="bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all flex items-center gap-sm">
+              {user ? "Go to Dashboard" : "Start Free"} <ArrowRight size={18} />
             </Link>
             <Link href="/pricing" className="border border-outline-variant text-on-surface px-xl py-md rounded-lg font-bold text-lg hover:bg-surface-variant active:scale-95 transition-all">
               See Pricing
@@ -172,8 +183,8 @@ export default function ProductPage() {
               <h2 className="text-headline-lg text-on-surface mb-sm">Ready to build your digital identity?</h2>
               <p className="text-body-lg text-on-surface-variant">Join 10,000+ creators already using BioLinks.</p>
             </div>
-            <Link href="/login?mode=signup" className="shrink-0 bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all flex items-center gap-sm">
-              Get Started Free <ArrowRight size={18} />
+            <Link href={user ? "/dashboard" : "/login?mode=signup"} className="shrink-0 bg-primary-container text-on-primary-container px-xl py-md rounded-lg font-bold text-lg hover:opacity-90 active:scale-95 transition-all flex items-center gap-sm">
+              {user ? "Go to Dashboard" : "Get Started Free"} <ArrowRight size={18} />
             </Link>
           </div>
         </section>

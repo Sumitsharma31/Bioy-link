@@ -53,6 +53,7 @@ const fadeUp = {
 };
 
 function PricingContent() {
+  const [dynamicPlans, setDynamicPlans] = useState(plans);
   const [annual, setAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
@@ -60,6 +61,29 @@ function PricingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+
+      const { data } = await supabase.from('pricing_plans').select('*');
+      if (data) {
+        setDynamicPlans(prev => prev.map(p => {
+          const fetched = data.find(db => db.tier_name.toLowerCase() === p.name.toLowerCase());
+          if (fetched) {
+            return {
+              ...p,
+              price: { monthly: fetched.monthly_price, annual: fetched.annual_price }
+            };
+          }
+          return p;
+        }));
+      }
+    }
+    fetchData();
+  }, [supabase]);
 
   const handleUpgrade = async (plan: any) => {
     try {
@@ -199,7 +223,7 @@ function PricingContent() {
         {/* Plans */}
         <section className="max-w-7xl mx-auto px-md sm:px-margin mb-xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-md items-stretch">
-            {plans.map((plan, i) => (
+            {dynamicPlans.map((plan, i) => (
               <motion.div key={plan.name} custom={i} initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
                 className={`rounded-xl p-xl flex flex-col relative ${plan.highlight
                     ? 'bg-surface-container border-2 border-primary-container shadow-[0_0_40px_rgba(210,232,35,0.08)]'
@@ -230,12 +254,12 @@ function PricingContent() {
                   ))}
                 </ul>
                 {plan.name === 'Standard' ? (
-                  <Link href={plan.href}
+                  <Link href={user ? "/dashboard" : plan.href}
                     className={`w-full py-md rounded-lg font-bold text-center flex items-center justify-center gap-sm transition-all active:scale-95 ${plan.highlight
                         ? 'bg-primary-container text-on-primary-container hover:opacity-90'
                         : 'border border-outline-variant text-on-surface hover:bg-surface-variant'
                       }`}>
-                    {plan.cta} {plan.highlight && <ArrowRight size={16} />}
+                    {user ? "Go to Dashboard" : plan.cta} {plan.highlight && <ArrowRight size={16} />}
                   </Link>
                 ) : (
                   <button

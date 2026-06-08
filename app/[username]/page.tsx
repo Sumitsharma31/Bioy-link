@@ -107,8 +107,21 @@ export default async function PublicProfile({
   const buttonRadius = appearance?.button_style === 'Sharp' ? '0px' : appearance?.button_style === 'Pill' ? '9999px' : '0.5rem';
   const fontFamily = appearance?.font_family !== 'Inter' ? `"${appearance?.font_family}", sans-serif` : undefined;
 
+  const bgImageUrl = appearance?.bg_image_url;
+
   return (
-    <div className="min-h-screen flex flex-col items-center py-xl px-md" style={{ backgroundColor: theme.bg, color: theme.text, fontFamily }}>
+    <div 
+      className="min-h-screen flex flex-col items-center py-xl px-md" 
+      style={{ 
+        backgroundColor: theme.bg, 
+        backgroundImage: bgImageUrl ? `url(${bgImageUrl})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        color: theme.text, 
+        fontFamily 
+      }}
+    >
       <div className="w-full max-w-[480px] flex flex-col items-center">
         {/* Avatar */}
         <div className="w-24 h-24 rounded-full border-2 p-sm mb-md overflow-hidden flex items-center justify-center" style={{ borderColor: theme.accent, backgroundColor: theme.card }}>
