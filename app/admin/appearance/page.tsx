@@ -38,7 +38,10 @@ export default async function AdminAppearancePage() {
             <h3 className="text-headline-sm text-on-surface">Add Background</h3>
           </div>
           
-          <form action={addBackgroundImage} className="flex flex-col gap-md">
+          <form action={async (formData) => {
+            'use server'
+            await addBackgroundImage(formData)
+          }} className="flex flex-col gap-md">
             <div>
               <label className="block text-label-sm text-on-surface-variant uppercase mb-xs">Image Name</label>
               <input 

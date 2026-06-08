@@ -19,8 +19,8 @@ export default async function AdminDashboard() {
   const newToday = authUsers?.filter(u => new Date(u.created_at) >= today).length || 0;
 
   // Calculate monthly growth for the last 5 months
-  const monthlyData = [];
-  const monthLabels = [];
+  const monthlyData: number[] = [];
+  const monthLabels: string[] = [];
   for (let i = 4; i >= 0; i--) {
     const d = new Date();
     d.setMonth(d.getMonth() - i);
