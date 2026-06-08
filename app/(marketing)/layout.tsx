@@ -6,6 +6,7 @@
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import MarketingPageWrapper from '@/components/layout/MarketingPageWrapper';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         {children}
       </MarketingPageWrapper>
       <Footer />
+      <MobileBottomNav />
     </>
   );
 }

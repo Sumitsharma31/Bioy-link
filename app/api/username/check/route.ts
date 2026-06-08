@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       available: false,
       isPremiumRequired: true,
+      premiumMessage: 'Usernames without numbers are Pro only. Try a variation below.',
       formatError: null,
       suggestions: generateSuggestions(username),
     });

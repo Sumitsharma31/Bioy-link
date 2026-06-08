@@ -110,19 +110,27 @@ export default async function PublicProfile({
   const bgImageUrl = appearance?.bg_image_url;
 
   return (
-    <div 
-      className="min-h-screen flex flex-col items-center py-xl px-md" 
-      style={{ 
-        backgroundColor: theme.bg, 
-        backgroundImage: bgImageUrl ? `url(${bgImageUrl})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-        color: theme.text, 
-        fontFamily 
-      }}
-    >
-      <div className="w-full max-w-[480px] flex flex-col items-center">
+    <>
+      {/* Fixed Background Layer to prevent mobile scrolling bugs */}
+      <div 
+        className="fixed inset-0 z-[-1]"
+        style={{ 
+          backgroundColor: theme.bg, 
+          backgroundImage: bgImageUrl ? `url(${bgImageUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+      
+      {/* Content Layer */}
+      <div 
+        className="min-h-screen flex flex-col items-center py-xl px-md relative z-0" 
+        style={{ 
+          color: theme.text, 
+          fontFamily 
+        }}
+      >
+        <div className="w-full max-w-[480px] flex flex-col items-center">
         {/* Avatar */}
         <div className="w-24 h-24 rounded-full border-2 p-sm mb-md overflow-hidden flex items-center justify-center" style={{ borderColor: theme.accent, backgroundColor: theme.card }}>
            {profile.avatar_url ? (
@@ -197,6 +205,6 @@ export default async function PublicProfile({
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

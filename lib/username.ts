@@ -88,10 +88,9 @@ export const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
  */
 export function isPremiumUsername(username: string): boolean {
   const clean = username.toLowerCase().trim();
-  if (clean.length >= 8) return false;
-  // If it contains digits, dots, or underscores → not premium-only
-  if (/[0-9._]/.test(clean)) return false;
-  return true;
+  // Free users must have at least one digit
+  if (!/[0-9]/.test(clean)) return true;
+  return false;
 }
 
 // ─────────────────────────────────────────────
@@ -164,7 +163,7 @@ export function validateUsername(
     return {
       ok: false,
       reason: 'PREMIUM_REQUIRED',
-      message: 'Short single-word usernames are reserved for Pro members',
+      message: 'Free tier usernames must contain at least 1 number.',
     };
   }
 
@@ -200,15 +199,15 @@ export function generateSuggestions(base: string): string[] {
 
   const candidates: string[] = [
     `${b}99`,
-    `hey.${b}`,
+    `hey.${b}1`,
     `${b}_${CURRENT_YEAR}`,
-    `${b}dev`,
-    `its${b}`,
-    `${b}.hq`,
+    `${b}dev7`,
+    `its${b}2`,
+    `${b}.hq1`,
     `${b}01`,
-    `the.${b}`,
-    `${b}_official`,
-    `im${b}`,
+    `the.${b}3`,
+    `${b}_official9`,
+    `im${b}4`,
   ];
 
   // Deduplicate and filter only valid free-plan usernames

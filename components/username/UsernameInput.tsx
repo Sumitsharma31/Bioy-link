@@ -12,7 +12,7 @@ type CheckState =
   | { status: 'checking' }
   | { status: 'available' }
   | { status: 'taken'; suggestions: string[] }
-  | { status: 'premium'; suggestions: string[] }
+  | { status: 'premium'; message?: string; suggestions: string[] }
   | { status: 'format_error'; message: string }
   | { status: 'reserved' };
 
@@ -22,6 +22,8 @@ interface UsernameInputProps {
   domain?: string;
   /** Called when the current value is a VALID, available username */
   onValidChange?: (username: string) => void;
+  /** Called when the current value is INVALID or checking */
+  onInvalidChange?: () => void;
   /** Controlled name attr so parent form can read it */
   inputName?: string;
 }
@@ -33,6 +35,7 @@ export default function UsernameInput({
   planType = 'free',
   domain = 'biolinks.me',
   onValidChange,
+  onInvalidChange,
   inputName = 'username',
 }: UsernameInputProps) {
   const [value, setValue] = useState(initialValue);
@@ -48,10 +51,12 @@ export default function UsernameInput({
       const format = validateUsernameFormat(normalized);
       if (!format.valid) {
         setCheckState({ status: 'format_error', message: format.error! });
+        onInvalidChange?.();
         return;
       }
 
       setCheckState({ status: 'checking' });
+      onInvalidChange?.();
 
       try {
         const res = await fetch(
@@ -61,14 +66,17 @@ export default function UsernameInput({
 
         if (data.formatError && data.formatError.includes('reserved')) {
           setCheckState({ status: 'reserved' });
+          onInvalidChange?.();
           return;
         }
         if (data.formatError) {
           setCheckState({ status: 'format_error', message: data.formatError });
+          onInvalidChange?.();
           return;
         }
         if (data.isPremiumRequired) {
-          setCheckState({ status: 'premium', suggestions: data.suggestions ?? [] });
+          setCheckState({ status: 'premium', message: data.premiumMessage, suggestions: data.suggestions ?? [] });
+          onInvalidChange?.();
           return;
         }
         if (data.available) {
@@ -77,11 +85,13 @@ export default function UsernameInput({
           return;
         }
         setCheckState({ status: 'taken', suggestions: data.suggestions ?? [] });
+        onInvalidChange?.();
       } catch {
         setCheckState({ status: 'format_error', message: 'Could not check availability' });
+        onInvalidChange?.();
       }
     },
-    [planType, onValidChange]
+    [planType, onValidChange, onInvalidChange]
   );
 
   // ── Handle input change ──────────────────────────────────────
@@ -91,10 +101,12 @@ export default function UsernameInput({
 
     if (!raw) {
       setCheckState({ status: 'idle' });
+      onInvalidChange?.();
       return;
     }
 
     setCheckState({ status: 'typing' });
+    onInvalidChange?.();
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => checkAvailability(raw), 420);
@@ -184,7 +196,7 @@ export default function UsernameInput({
         {checkState.status === 'premium' && (
           <p className="text-label-sm text-violet-400 flex items-center gap-xs">
             <Crown size={12} />
-            <span>Short single-word usernames are <strong>Pro only</strong>. Try a variation below.</span>
+            <span>{checkState.message || "Short single-word usernames are Pro only. Try a variation below."}</span>
           </p>
         )}
       </div>

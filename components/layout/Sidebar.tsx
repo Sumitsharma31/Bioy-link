@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import { ADMIN_EMAILS } from '@/lib/admins';
 import {
   LayoutDashboard,
@@ -69,6 +70,13 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
         console.error('Failed to copy: ', err);
       }
     }
+  };
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
   };
 
   return (
@@ -176,13 +184,13 @@ const Sidebar = ({ isOpen, onClose, profile }: SidebarProps) => {
             <HelpCircle size={18} />
             <span className="text-label-md">Help Center</span>
           </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-md text-on-surface-variant hover:text-error px-sm py-xs transition-colors"
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-md text-on-surface-variant hover:text-error px-sm py-xs transition-colors w-full text-left"
           >
             <LogOut size={18} />
             <span className="text-label-md">Logout</span>
-          </Link>
+          </button>
         </div>
       </aside>
     </>

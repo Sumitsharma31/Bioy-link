@@ -315,7 +315,7 @@ const SettingsClient = ({ user, profile }: SettingsClientProps) => {
 
                 <form
                   action={usernameAction}
-                  className={`space-y-md flex-1 flex flex-col ${profile?.subscription_tier !== 'premium' ? 'pointer-events-none opacity-50 select-none grayscale' : ''}`}
+                  className="space-y-md flex-1 flex flex-col"
                 >
                   <input type="hidden" name="new_username" value={newUsername} />
                   <div className="flex-1">
@@ -324,6 +324,7 @@ const SettingsClient = ({ user, profile }: SettingsClientProps) => {
                       planType={(profile?.subscription_tier === 'premium' ? 'premium' : 'free')}
                       domain="biolinks.me"
                       onValidChange={(u) => { setNewUsername(u); setNewUsernameReady(true); }}
+                      onInvalidChange={() => setNewUsernameReady(false)}
                       inputName="_new_username_display"
                     />
 
@@ -339,7 +340,7 @@ const SettingsClient = ({ user, profile }: SettingsClientProps) => {
 
                   <button
                     type="submit"
-                    disabled={!newUsernameReady || isUsernamePending || profile?.subscription_tier !== 'premium'}
+                    disabled={!newUsernameReady || isUsernamePending}
                     className="flex items-center gap-sm bg-primary-container text-on-primary-container px-md py-sm rounded-lg font-bold text-label-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed mt-auto self-start"
                   >
                     {isUsernamePending ? <Loader2 size={16} className="animate-spin" /> : 'Save Username'}
